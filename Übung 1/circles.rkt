@@ -70,6 +70,8 @@
 ;; calculate-properties: number number number symbol -> number
 ;; Explanation: Returns property of circle defined by center and radius specified by symbol. Possible properties: 'Area 'Circumference 'Diameter 'Distance (Distance to (0|0))
 ;; Example: (calculate-properties 2 4 10 'Diameter) -> 20
+;;          (calculate-properties 2 4 10 'Distance) -> sqrt 20
+;;          (calculate-properties 2 4 10 'Circumfence) -> 20 pi
 ;; NOTE: 'Distance returns distance _of center point_ to (0|0), not the minimum distance of any point on the circle to (0|0)
 
 (define (calculate-properties x y r s)
