@@ -4,7 +4,7 @@
 ;; Helper functions / subroutines
 
 ;; Math-min
-;; math-min number number -> number
+;; math-min: number number -> number
 ;; Explanation: Returns the smaller of two given numbers
 ;; Example: (math-min 8 4) -> 4
 
@@ -18,7 +18,7 @@
 (check-expect (math-min -3.14 -4.2) -4.2)
 
 ;; Math-max
-;; math-max number number -> number
+;; math-max: number number -> number
 ;; Explanation: Returns the larger of two given numbers
 ;; Example: (math-max 8 4) -> 8
 
@@ -34,7 +34,7 @@
 ;; Exercise 7.1
 ;; distance-centers: number number number number -> number
 ;; Explanation: Calculates euclidean distance between two points [centerpoints of circles, specifically] (x1 y1) and (x2 y2)
-;; Example: (distance-centers 0 0 1 1) -> sqrt 2
+;; Example: (distance-centers 0 0 1 1) -> sqrt 2 ~= 1.41
 
 (define (distance-centers x1 y1 x2 y2)
   (sqrt (+ (sqr (- x1 x2)) (sqr (- y1 y2))))
@@ -71,8 +71,8 @@
 ;; calculate-properties: number number number symbol -> number
 ;; Explanation: Returns a property of the circle defined by center and radius (x, y, r) specified by symbol. Possible properties: 'Area 'Circumference 'Diameter 'Distance (Distance to origin)
 ;; Example: (calculate-properties 2 4 10 'Diameter) -> 20
-;;          (calculate-properties 2 4 10 'Distance) -> sqrt 20
-;;          (calculate-properties 2 4 10 'Circumfence) -> 20 * pi
+;;          (calculate-properties 2 4 10 'Distance) -> sqrt 20 ~= 4.47
+;;          (calculate-properties 2 4 10 'Circumference) -> 20 * pi ~= 62.83
 ;; NOTE: 'Distance returns distance _of center point_ to origin, not the minimum distance of any point on the circle to origin
 
 (define (calculate-properties x y r s)
