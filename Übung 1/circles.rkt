@@ -47,9 +47,10 @@
 
 ;; Exercise 7.2
 ;; circles-position: number number number number number number -> symbol
-;; Explanation: Determines the position of two circles  defined by center point and radius to each other
-;;              and returns 'External 'Intersect or 'Internal accordingly
-;; Example: (circles-position 0 0 1 1 0 1) -> 'Intersect (touching counts as intersection)
+;; Explanation: Determines the position of two circles  defined by center point and radius (x1, y1, r1, x2, y2, r2) to each other
+;;              and returns 'External 'Intersect or 'Internal accordingly ('External for no overlap, 'Intersect for overlapping circles, and 'Internal for a circle fully inside the other)
+;;              For the purpose of this function, tangent circles are recognized as intersecting in every case
+;; Example: (circles-position 0 0 1 1 0 1) -> 'Intersect 
 
 (define (circles-position x1 y1 r1 x2 y2 r2)
   (cond
@@ -68,11 +69,11 @@
 
 ;; Exercise 7.3
 ;; calculate-properties: number number number symbol -> number
-;; Explanation: Returns property of circle defined by center and radius specified by symbol. Possible properties: 'Area 'Circumference 'Diameter 'Distance (Distance to (0|0))
+;; Explanation: Returns a property of the circle defined by center and radius (x, y, r) specified by symbol. Possible properties: 'Area 'Circumference 'Diameter 'Distance (Distance to origin)
 ;; Example: (calculate-properties 2 4 10 'Diameter) -> 20
 ;;          (calculate-properties 2 4 10 'Distance) -> sqrt 20
-;;          (calculate-properties 2 4 10 'Circumfence) -> 20 pi
-;; NOTE: 'Distance returns distance _of center point_ to (0|0), not the minimum distance of any point on the circle to (0|0)
+;;          (calculate-properties 2 4 10 'Circumfence) -> 20 * pi
+;; NOTE: 'Distance returns distance _of center point_ to origin, not the minimum distance of any point on the circle to origin
 
 (define (calculate-properties x y r s)
   (cond
