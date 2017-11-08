@@ -80,7 +80,7 @@
 
 ;; mean-of-given: subject -> number
 ;; Explanation: Calculates average reaction time of a given subject
-;; Example: (mean-of-given VP01) -> #TODO
+;; Example: (mean-of-given VP07) -> 264
 (define (mean-of-given subject)
   (/ (list-sum (subject-times subject)) (length (subject-times subject)))
 )
@@ -91,7 +91,7 @@
 
 ;; std-of-given: subject -> number
 ;; Explanation: Calculates standart deviation of reaction times given subject
-;; Example:
+;; Example: (std-of-given VP01) -> ~52.577
 (define (std-of-given subject)
   (sqrt (/ (sum-squared-diffs (subject-times subject) (mean-of-given subject)) (- (length (subject-times subject)) 1)))
 )
@@ -162,7 +162,7 @@
 (define (mean-of-subject people code)
   (cond
     [(empty? people) false] ;; Subject code not found in list
-    ;; If subject code is found, sum up list of times and divide by list length
+    ;; If subject code is found, return mean of subject
     [(symbol=? (person-code (subject-person (first people))) code) (mean-of-given (first people))]
     ;; Otherwise, check rest of list
     [else (mean-of-subject (rest people) code)]
@@ -177,7 +177,7 @@
 
 ;; std-of-subject: (listof subject) symbol -> number
 ;; Explanation: Scans list of subjects for subject with matching ID code and calculates, if found, the standard deviation of that subject's reaction times
-;; Example:
+;; Example: (std-of-subject subjects 'MW17K) -> ~52.577
 (define (std-of-subject people code)
   (cond
     [(empty? people) false] ;; Subject code not found in list
