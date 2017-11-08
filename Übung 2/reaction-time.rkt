@@ -76,6 +76,7 @@
 ;; Tests
 (check-expect (sum-squared-diffs empty 123) 0)
 (check-expect (sum-squared-diffs (list 5 6 7) 0) 110)
+(check-within (sum-squared-diffs (list 1.2 3 100) 50) 7090.44 0.0001)
 
 ;; mean-of-given: subject -> number
 ;; Explanation: Calculates average reaction time of a given subject
@@ -85,17 +86,19 @@
 )
 
 ;; Tests
-;;#TODO
+(check-within (mean-of-given VP01) 258.6 0.0001)
+(check-expect (mean-of-given VP07) 264)
 
 ;; std-of-given: subject -> number
 ;; Explanation: Calculates standart deviation of reaction times given subject
 ;; Example:
 (define (std-of-given subject)
-  (sqrt (/ (sum-squared-diffs (subject-times subject) (mean-of-given subject)) (+ (length (subject-times subject)) 1)))
+  (sqrt (/ (sum-squared-diffs (subject-times subject) (mean-of-given subject)) (- (length (subject-times subject)) 1)))
 )
 
 ;; Tests
-;;#TODO
+(check-within (std-of-given VP07) 52.3259 0.001)
+(check-within (std-of-given VP03) 14.63899 0.001)
 
 ;; gender-overhang: (listof subject) -> number
 ;; Explanation: Returns difference in number of female to male subjects - positive n means n more female subjects, negative n means n more male subjects. 0 if male and female are balanced
@@ -186,4 +189,7 @@
 )
 
 ;; Tests
+(check-within (std-of-subject subjects 'RA15R) 52.3259 0.001)
+(check-within (std-of-subject subjects 'CT03R) 14.63899 0.001)
+(check-expect (std-of-subject subjects 'doesntexist) false)
 
