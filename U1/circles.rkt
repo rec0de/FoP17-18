@@ -48,20 +48,20 @@
 ;; Exercise 7.2
 ;; circles-position: number number number number number number -> symbol
 ;; Explanation: Determines the position of two circles  defined by center point and radius (x1, y1, r1, x2, y2, r2) to each other
-;;              and returns 'External 'Intersect or 'Internal accordingly ('External for no overlap, 'Intersect for overlapping circles, and 'Internal for a circle fully inside the other)
+;;              and returns 'External 'Intersect or 'Interior accordingly ('External for no overlap, 'Intersect for overlapping circles, and 'Interior for a circle fully inside the other)
 ;;              For the purpose of this function, tangent circles are recognized as intersecting in every case
 ;; Example: (circles-position 0 0 1 1 0 1) -> 'Intersect 
 
 (define (circles-position x1 y1 r1 x2 y2 r2)
   (cond
-    [(< (+ (distance-centers x1 y1 x2 y2) (math-min r1 r2)) (math-max r1 r2)) 'Internal] ;; One circle is inside the other iff the farthest point from the second circle's center (distance + radius) is still within radius of the second circle
+    [(< (+ (distance-centers x1 y1 x2 y2) (math-min r1 r2)) (math-max r1 r2)) 'Interior] ;; One circle is inside the other iff the farthest point from the second circle's center (distance + radius) is still within radius of the second circle
     [(> (distance-centers x1 y1 x2 y2) (+ r1 r2)) 'External] ;; Two circles don't touch each other iff the distance btwn center points is larger than the sum of their radii
     [else 'Intersect] ;; Intersection is last remaining possibility
   )
 )
 
 ;; Tests
-(check-expect (circles-position 0 0 10 1 2 2) 'Internal)
+(check-expect (circles-position 0 0 10 1 2 2) 'Interior)
 (check-expect (circles-position -2 0 1 2 0 1) 'External)
 (check-expect (circles-position 0 0 1 1 0 1) 'Intersect)
 (check-expect (circles-position 0 0 2 0 1 1) 'Intersect) ;; One circle touching the other from within
