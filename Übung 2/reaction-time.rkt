@@ -25,39 +25,24 @@
 ;; math-min: number number -> number
 ;; Explanation: Returns the smaller of two given numbers
 ;; Example: (math-min 8 4) -> 4
-
 (define (math-min a b)
   (if (< a b) a b)
 )
 
 ;; Tests
 (check-expect (math-min 500 499) 499)
-(check-expect (math-min -5 1) -5)
 (check-expect (math-min -3.14 -4.2) -4.2)
 
 ;; math-max: number number -> number
 ;; Explanation: Returns the larger of two given numbers
 ;; Example: (math-max 8 4) -> 8
-
 (define (math-max a b)
   (if (< a b) b a)
 )
 
 ;; Tests
 (check-expect (math-max 500 499) 500)
-(check-expect (math-max -5 1) 1)
 (check-expect (math-max -3.14 -4.2) -3.14)
-
-;; subject-age: subject -> number
-;; Explanation: Returns age of a given subject
-;; Example: (subject-age (make-subject (make-person 19 'f 'OM29Q)) -> 19
-(define (subject-age input-subject)
-  (person-age (subject-person input-subject))
-)
-
-;; Tests
-(check-expect (subject-age VP01) 22)
-(check-expect (subject-age VP09) 24)
 
 ;; gender-to-number: subject -> number
 ;; Explanation: Returns -1 if given subject is male (or unrecognized), 1 if subject is female
@@ -80,6 +65,37 @@
 ;; Tests
 (check-expect (list-sum (list 1 2 3)) 6)
 (check-expect (list-sum (list 100, 20, 500, 4)) 624)
+
+;; sum-squared-diffs: (listof number) number -> number
+;; Explanation: Caluclates square of difference of each list value to reference value and returns sum of all squared differences
+;; Example: (sum-squared-diffs (list 1 2 3 4) 2) -> 6
+(define (sum-squared-diffs numbers mean)
+  (if (empty? input) 0 (+ (sqr (- (first input) mean)) (sum-squared-diffs (rest input))))
+)
+
+;; Tests
+(check-expect (sum-squared-diffs empty 123) 0)
+(check-expect (sum-squared-diffs (list 5 6 7) 0) 110)
+
+;; mean-of-given: subject -> number
+;; Explanation: Calculates average reaction time of a given subject
+;; Example: (mean-of-given VP01) -> #TODO
+(define (mean-of-given subject)
+  (/ (list-sum (subject-times subject)) (length (subject-times subject)))
+)
+
+;; Tests
+#TODO
+
+;; std-of-given: subject -> number
+;; Explanation: Calculates standart deviation of reaction times given subject
+;; Example:
+(define (std-of-given subject)
+  (sqrt (/ (sum-squared-diffs (subject-times subject) (mean-of-given subject)) (+ (length (subject-times subject)) 1)))
+)
+
+;; Tests
+#TODO
 
 ;; gender-overhang: (listof subject) -> number
 ;; Explanation: Returns difference in number of female to male subjects - positive n means n more female subjects, negative n means n more male subjects. 0 if male and female are balanced
@@ -106,7 +122,12 @@
 (define (youngest-oldest-subject people comparator)
   (cond
     [(empty? people) (if (symbol=? comparator 'oldest) 0 +inf.0)]
-    [else (if (symbol=? comparator 'oldest) (math-max (subject-age (first people)) (youngest-oldest-subject(rest people) 'oldest)) (math-min (subject-age (first people)) (youngest-oldest-subject(rest people) 'youngest)))]
+    [else
+      (if (symbol=? comparator 'oldest)
+        (math-max (person-age (subject-person first people)) (youngest-oldest-subject(rest people) 'oldest))
+        (math-min (person-age (subject-person first people)) (youngest-oldest-subject(rest people) 'youngest))
+      )
+    ]
   )
 )
 
@@ -132,14 +153,14 @@
 
 ;; Exercise 6.3
 
-;; mean-of-subject: (listof subject) -> number
+;; mean-of-subject: (listof subject) symbol -> number
 ;; Explanation: Scans list of subjects for subject with matching ID code and calculates, if found, the average response time for that subject
 ;; Example: (mean-of-subject subjects 'MW17K) -> 258.6
 (define (mean-of-subject people code)
   (cond
     [(empty? people) false] ;; Subject code not found in list
     ;; If subject code is found, sum up list of times and divide by list length
-    [(symbol=? (person-code (subject-person (first people))) code) (/ (list-sum (subject-times (first people))) (length (subject-times (first people))))]
+    [(symbol=? (person-code (subject-person (first people))) code) (mean-of-given (first people))]
     ;; Otherwise, check rest of list
     [else (mean-of-subject (rest people) code)]
   )
@@ -151,11 +172,17 @@
 
 ;; Exercise 6.4
 
-;; std-of-subject:
-;; Explanation:
+;; std-of-subject: (listof subject) symbol -> number
+;; Explanation: Scans list of subjects for subject with matching ID code and calculates, if found, the standard deviation of that subject's reaction times
 ;; Example:
 (define (std-of-subject people code)
-  true
+  (cond
+    [(empty? people) false] ;; Subject code not found in list
+    ;; If subject code is found, return stdd of subject
+    [(symbol=? (person-code (subject-person (first people))) code) (std-of-given (first people))]
+    ;; Otherwise, check rest of list
+    [else (std-of-subject (rest people) code)]
+  )
 )
 
 ;; Tests
