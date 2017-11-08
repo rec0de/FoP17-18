@@ -64,13 +64,13 @@
 
 ;; Tests
 (check-expect (list-sum (list 1 2 3)) 6)
-(check-expect (list-sum (list 100, 20, 500, 4)) 624)
+(check-expect (list-sum (list 100 20 500 4)) 624)
 
 ;; sum-squared-diffs: (listof number) number -> number
 ;; Explanation: Caluclates square of difference of each list value to reference value and returns sum of all squared differences
 ;; Example: (sum-squared-diffs (list 1 2 3 4) 2) -> 6
 (define (sum-squared-diffs numbers mean)
-  (if (empty? input) 0 (+ (sqr (- (first input) mean)) (sum-squared-diffs (rest input))))
+  (if (empty? numbers) 0 (+ (sqr (- (first numbers) mean)) (sum-squared-diffs (rest numbers) mean)))
 )
 
 ;; Tests
@@ -85,7 +85,7 @@
 )
 
 ;; Tests
-#TODO
+;;#TODO
 
 ;; std-of-given: subject -> number
 ;; Explanation: Calculates standart deviation of reaction times given subject
@@ -95,7 +95,7 @@
 )
 
 ;; Tests
-#TODO
+;;#TODO
 
 ;; gender-overhang: (listof subject) -> number
 ;; Explanation: Returns difference in number of female to male subjects - positive n means n more female subjects, negative n means n more male subjects. 0 if male and female are balanced
@@ -124,8 +124,8 @@
     [(empty? people) (if (symbol=? comparator 'oldest) 0 +inf.0)]
     [else
       (if (symbol=? comparator 'oldest)
-        (math-max (person-age (subject-person first people)) (youngest-oldest-subject(rest people) 'oldest))
-        (math-min (person-age (subject-person first people)) (youngest-oldest-subject(rest people) 'youngest))
+        (math-max (person-age (subject-person (first people))) (youngest-oldest-subject(rest people) 'oldest))
+        (math-min (person-age (subject-person (first people))) (youngest-oldest-subject(rest people) 'youngest))
       )
     ]
   )
@@ -168,7 +168,7 @@
 
 ;; Tests
 (check-within (mean-of-subject subjects 'MW17K) 258.6 0.0001)
-(check-expect (mean-of-subject subjects 'MP25G) 229.4 0.0001)
+(check-within (mean-of-subject subjects 'MP25G) 229.4 0.0001)
 
 ;; Exercise 6.4
 
