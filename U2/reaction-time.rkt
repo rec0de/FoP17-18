@@ -142,17 +142,17 @@
 ;; Exercise 6.2
 
 ;; balanced-sex: (listof subject) -> boolean
-;; Explanation: Checks if gender distribution of given subject list is balaced. Returns true if number of male and female subjects is equal, false otherwise
+;; Explanation: Checks if gender distribution of given subject list is balaced. Returns true if number of male and female subjects is equal, false otherwise. Throws error on empty input
 ;; Example: (balanced-sex (list VP01 VP02 VP03)) -> false
 (define (balanced-sex people)
-  (zero? (gender-overhang people))
+  (if (empty? people) (error 'balanced-sex "no subjects existing") (zero? (gender-overhang people)))
 )
 
 ;; Tests
 (check-expect (balanced-sex (list VP01 VP02)) true)
 (check-expect (balanced-sex (list VP02 VP03)) false)
 (check-expect (balanced-sex (list VP01 VP04 VP05 VP02)) false)
-(check-expect (balanced-sex empty) true)
+(check-error (balanced-sex empty) "balanced-sex: no subjects existing")
 
 ;; Exercise 6.3
 
