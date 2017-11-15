@@ -20,10 +20,32 @@
 (check-expect (convert-to-base-four 812) (list 3 0 2 3 0))
 ;;(check-expect (convert-to-base-four 0) (list 0))
 
+
+
+;; convert-from-base-four: (listof number) -> number
+;; Explanation:
+;; Example: (convert-from-base-four (list 1 0)) -> 4
+(define (convert-from-base-four base4)
+  ;; Lambda: number, number -> number
+  ;; Explanation:
+  ;; Example:
+  (foldl (lambda (digit num) (+ (* 4 num) digit)) 0 base4) ;; Reads most significant number first, then multiplies already converted part by 4, 'shifting' by one b4 digit
+)
+
+;; Tests
+(check-expect (convert-from-base-four (list 3 0 2 3 0)) 812)
+(check-expect (convert-from-base-four (list 0)) 0)
+(check-expect (convert-from-base-four empty) 0)
+
+
+
 ;; string->encodeable: string -> (listof (listof number))
 ;; Explanation:
 ;; Example: (string->encodeable "ABC") -> (list (list 1 0 0 1) (list 1 0 0 2) (list 1 0 0 3))
 (define (string->encodeable s)
+  ;; Lambda: string -> (listof number)
+  ;; Explanation:
+  ;; Example: A -> (list 1 0 0 1)
   (map (lambda (s) (convert-to-base-four (string->int s))) (explode s))
 )
 
@@ -33,15 +55,23 @@
 (check-expect (string->encodeable "F4ncY S#1t") (list (list 1 0 1 2) (list 3 1 0) (list 1 2 3 2) (list 1 2 0 3) (list 1 1 2 1) (list 2 0 0) (list 1 1 0 3) (list 2 0 3) (list 3 0 1) (list 1 3 1 0)))
 (check-expect (string->encodeable "") empty)
 
+
+
 ;; encodable->string: (listof (listof number)) -> string
 ;; Explanation:
 ;; Example: 
 (define (encodeable->string lon)
-  true
+  (implode (map int->string (map convert-from-base-four lon))) ;; Two maps are not worth the lambda, I guess?
 )
 
-;;(check-expect (encodeable->string (list (list 1 2 1 2) (list 1 2 3 3) (list 1 3 0 0))) "fop")
-;;(check-expect (encodeable->string (list (list 1 0 1 2) (list 1 0 3 3) (list 1 1 0 0))) "FOP")
+;; Tests
+(check-expect (encodeable->string (list (list 1 2 1 2) (list 1 2 3 3) (list 1 3 0 0))) "fop") ;; pre-defined
+(check-expect (encodeable->string (list (list 1 0 1 2) (list 1 0 3 3) (list 1 1 0 0))) "FOP") ;; pre-defined
+(check-expect (encodeable->string (list (list 1 0 0 1) (list 1 0 0 2) (list 1 0 0 3))) "ABC")
+(check-expect (encodeable->string (list (list 3 0 1) (list 1 3 0 1) (list 3 2 0) (list 3 1 0))) "1q84")
+(check-expect (encodeable->string empty) "")
+
+
 
 ;; load-image: string -> (list of color)
 ;; Loads the image given by path-to-image and converts it to a list of color.
@@ -63,8 +93,34 @@
   )
 
 
+
+;; char-to-int: string -> number
+;; Explanation: Converts a single character to its position in the alphabet, starting at A = 0. Case is ignored
+;; Example:(char-to-int "b") -> 1
+(define (char-to-int char)
+  (if (> (string->int char) 94) (- (string->int char) 97) (- (string->int char) 65))
+)
+
+;; Tests
+(check-expect (char-to-int "a") 0)
+(check-expect (char-to-int "B") 1)
+(check-expect (char-to-int "z") 25)
+
+;; steganographie-enc:
+;; Explanation:
+;; Example:
 (define (steganographie-enc loc m k)
-  true
+  (local
+    ((define password k)
+     (define msg m)
+     ;; normalize-pw: string -> (listof number)
+     ;; Explanation: Turns password into sorted, deduped list of numbers corresponding to positions of password letters in the alphabet
+     ;; Example: (normalize-pw "fabcab") -> (list 0 1 2 4)
+     (define (normalize-pw pw)
+       (sort (map char-to-int (explode pw)) <)
+     ))
+    (+ 1 1)
+  )
 )
 
 
