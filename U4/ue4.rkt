@@ -1,6 +1,6 @@
 ;; The first three lines of this file were inserted by DrRacket. They record metadata
 ;; about the language level of this file in a form that our tools can easily process.
-#reader(lib "htdp-intermediate-lambda-reader.ss" "lang")((modname ue4) (read-case-sensitive #t) (teachpacks ((lib "image.rkt" "teachpack" "htdp"))) (htdp-settings #(#t constructor repeating-decimal #f #t none #f ((lib "image.rkt" "teachpack" "htdp")) #f)))
+#reader(lib "htdp-intermediate-lambda-reader.ss" "lang")((modname ue4) (read-case-sensitive #t) (teachpacks ((lib "image.rkt" "teachpack" "2htdp"))) (htdp-settings #(#t constructor repeating-decimal #f #t none #f ((lib "image.rkt" "teachpack" "2htdp")) #f)))
 ;; The alphabet we use is encoded in eight bits and the numbers correspond to ASCII symbols.
 ;; ASCII number 27 "\e" is used as termination symbol.
 
@@ -106,20 +106,120 @@
 (check-expect (char-to-int "B") 1)
 (check-expect (char-to-int "z") 25)
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; steganographie-enc helper functions
+;; not using local here to avoid having a huge block of untestable code
+
+;; quick-contains: number (listof number) -> boolean
+;; Explanation: Expects a _sorted_ list of numbers and returns true if given number is in list (comparably fast)
+;; Example: (quick-contains 2 (list 1 2 3)) -> true
+(define (quick-contains num lon)
+  (cond
+    [(empty? lon) false]
+    [(< num (first lon)) false]
+    [(= num (first lon)) true]
+    [else (quick-contains num (rest lon))]
+  )
+)
+(check-expect (quick-contains 3 (list 1 2 5 7 8 9 384)) false)
+(check-expect (quick-contains 50 (list 3 11 23 42 50 51 77)) true)
+(check-expect (quick-contains 1337 empty) false)
+
+;; dedupe: (listof X) (X X -> boolean) -> (listof X)
+;; Explanation: Removes duplicates from a given list using the specified operator to determine equality
+;; Example: (dedupe (list 1 1 2 3 3 4) =) -> (list 1 2 3 4)
+(define (dedupe rawlist eqop)
+  (local
+    ;; contains? : X (listof X) (X X -> boolean) -> boolean
+    ;; Explanation:
+    ;; Example:
+    ((define (contains? needle haystack eqop)
+       ;; Lambda: X -> boolean
+       ;; Explanation:
+       ;; Example:
+       (not (empty? (filter (lambda (compare) (eqop needle compare)) haystack)))
+    ))
+    (cond
+      [(empty? rawlist) empty]
+      [(contains? (first rawlist) (rest rawlist) eqop) (dedupe (rest rawlist) eqop)]
+      [else (cons (first rawlist) (dedupe (rest rawlist) eqop))]
+    )
+  )
+)
+(check-expect (dedupe (list 1 1 1 1) =) (list 1))
+(check-expect (dedupe (list 1 2 3 4 5 2) =) (list 1 3 4 5 2))
+
+;; normalize-pw: string -> (listof number)
+;; Explanation: Turns password into sorted, deduped list of numbers corresponding to positions of password letters in the alphabet
+;; Example: (normalize-pw "fabcab") -> (list 0 1 2 5)
+(define (normalize-pw pw)
+  (sort (dedupe (map char-to-int (explode pw)) =) <)
+)
+(check-expect (normalize-pw "fabcab") (list 0 1 2 5))
+(check-expect (normalize-pw "zAZy") (list 0 24 25))
+
+;; char-in-color: color (listof number) -> color
+;; Explanation:
+;; Example:
+(define (char-in-color col char)
+  (local
+    ((define r (color-red col))
+     (define g (color-green col))
+     (define b (color-blue col))
+     (define a (color-alpha col))
+     ;; rnd: number -> number
+     ;; Explanation: Rounds last two bits to zero TODO: more info
+     ;; Example: (rnd 255) -> 252
+     (define (rnd byte)
+       (- byte (modulo byte 4))
+     ))
+     (make-color (+ (rnd r) (first char)) (+ (rnd g) (second char)) (+ (rnd b) (third char)) (+ (rnd a) (fourth char)))
+  )
+)
+(check-expect (char-in-color (make-color 255 255 255 255) (list 0 1 2 3)) (make-color 252 253 254 255))
+(check-expect (char-in-color (make-color 0 0 0 0) (list 3 1 2 0)) (make-color 3 1 2 0))
+
 ;; steganographie-enc:
 ;; Explanation:
 ;; Example:
 (define (steganographie-enc loc m k)
   (local
-    ((define password k)
-     (define msg m)
-     ;; normalize-pw: string -> (listof number)
-     ;; Explanation: Turns password into sorted, deduped list of numbers corresponding to positions of password letters in the alphabet
-     ;; Example: (normalize-pw "fabcab") -> (list 0 1 2 4)
-     (define (normalize-pw pw)
-       (sort (map char-to-int (explode pw)) <)
-     ))
-    (+ 1 1)
+    (
+     
+     ;; padd-to-four: (listof number) -> (listof number)
+     ;; Explanation:
+     ;; Example:
+     (define (padd-to-four lst)
+       (cond
+         ;; Not gonna make that recursive...
+         [(> (length lst) 4) (error 'padd-to-four "padding to four needs list with =< 4 elements")]
+         [(= (length lst) 4) lst]
+         [(= (length lst) 3) (cons 0 lst)]
+         [(= (length lst) 2) (append (list 0 0) lst)]
+         [(= (length lst) 1) (append (list 0 0 0) lst)]
+         [else (error 'padd-to-four "attempting to padd empty list")]
+       )
+     )
+    
+     ;; process-pixels: (listof color) number (listof (listof number)) -> (listof color)
+     ;; Explanation:
+     ;; Example:
+     (define (process-pixels loc index message)
+       (cond
+         [(empty? loc) (if (empty? message) empty (error 'steganographie-enc "message too long (inner check failed)"))] ;; If I got this right it should never happen...
+         [(and (not (empty? message)) (quick-contains index password))
+          (cons (char-in-color (first loc) (first message)) (process-pixels (rest loc) (modulo (+ index 1) 26) (rest message)))]
+         [else (cons (first loc) (process-pixels (rest loc) (modulo (+ index 1) 26) message))]
+       )
+     )
+     (define password (normalize-pw k))
+     (define msg (map padd-to-four (string->encodeable m))))
+    (cond
+      [(empty? loc) (error 'steganographie-enc "input image data is empty")]
+      [(< (length loc) (* (/ (length msg) (length password)) 26)) (error 'steganographie-enc "message too long")]
+      [else true]
+    )
   )
 )
 
