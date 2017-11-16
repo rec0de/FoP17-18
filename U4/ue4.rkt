@@ -23,13 +23,14 @@
 
 
 ;; convert-from-base-four: (listof number) -> number
-;; Explanation:
+;; Explanation: Converts numbers from their base4 representation (digits as list items) back to base10 numbers
 ;; Example: (convert-from-base-four (list 1 0)) -> 4
 (define (convert-from-base-four base4)
   ;; Lambda: number, number -> number
-  ;; Explanation:
-  ;; Example:
-  (foldl (lambda (digit num) (+ (* 4 num) digit)) 0 base4) ;; Reads most significant number first, then multiplies already converted part by 4, 'shifting' by one b4 digit
+  ;; Explanation: Adds the newest digit and multiplies all already read digits (or rather, their sum) by four,
+  ;;              thereby 'shifting' them one base4 digit to the right and adding the new one as the least significant one
+  ;; Example: 2 20 -> 82
+  (foldl (lambda (digit num) (+ (* 4 num) digit)) 0 base4)
 )
 
 ;; Tests
@@ -40,7 +41,7 @@
 
 
 ;; string->encodeable: string -> (listof (listof number))
-;; Explanation:
+;; Explanation: Converts a string into a list of base4 numbers representing one character each (ASCII character codes used)
 ;; Example: (string->encodeable "ABC") -> (list (list 1 0 0 1) (list 1 0 0 2) (list 1 0 0 3))
 (define (string->encodeable s)
   ;; Lambda: string -> (listof number)
@@ -58,8 +59,8 @@
 
 
 ;; encodable->string: (listof (listof number)) -> string
-;; Explanation:
-;; Example: 
+;; Explanation: Reads a list of base4 numbers (as lists) and interprets each number as an ASCII character. Returns a string of all characters.
+;; Example: (encodeable->string (list (list 1 0 0 3) (list 1 0 0 1) (list 1 0 0 2))) -> CAB
 (define (encodeable->string lon)
   (implode (map int->string (map convert-from-base-four lon))) ;; Two maps are not worth the lambda, I guess?
 )
@@ -128,12 +129,12 @@
 (define (dedupe rawlist eqop)
   (local
     ;; contains? : X (listof X) (X X -> boolean) -> boolean
-    ;; Explanation:
-    ;; Example:
+    ;; Explanation: Returns true if the needle element is found in the haystack list, false otherwise, using eqop for equality checking
+    ;; Example: (contains? 3 (list 1 2 3) =) -> true
     ((define (contains? needle haystack eqop)
        ;; Lambda: X -> boolean
-       ;; Explanation:
-       ;; Example:
+       ;; Explanation: Compares input to needle, returns true if equal using eqop, false otherwise
+       ;; Example: [assume needle = 'needle, eqop = symbol=?] 'noneedle -> false
        (not (empty? (filter (lambda (compare) (eqop needle compare)) haystack)))
     ))
     (cond
@@ -156,8 +157,8 @@
 (check-expect (normalize-pw "zAZy") (list 0 24 25))
 
 ;; char-in-color: color (listof number) -> color
-;; Explanation:
-;; Example:
+;; Explanation: Embeds a single character (given as a base4 number) into a color (2bit in the least significant bits of each color component)
+;; Example: (char-in-color (make-color 255 255 255) (list 1 2 3 2)) -> (make-color 253 254 255 254)
 (define (char-in-color col char)
   (local
     ((define r (color-red col))
@@ -165,7 +166,7 @@
      (define b (color-blue col))
      (define a (color-alpha col))
      ;; rnd: number -> number
-     ;; Explanation: Rounds last two bits to zero TODO: more info
+     ;; Explanation: 'Rounds' a base10 integer so that the last two bits of its base2 representation are zero
      ;; Example: (rnd 255) -> 252
      (define (rnd byte)
        (- byte (modulo byte 4))
@@ -177,8 +178,8 @@
 (check-expect (char-in-color (make-color 0 0 0 0) (list 3 1 2 0)) (make-color 3 1 2 0))
 
 ;; char-from-color: color -> (listof number)
-;; Explanation:
-;; Example:
+;; Explanation: Extracts the 2 least significant bits from a color component-wise and returns results as a base4 number
+;; Example: (char-from-color (make-color 253 254 255 254)) -> (list 1 2 3 2)
 (define (char-from-color col)
   (local
     ((define r (color-red col))
@@ -239,7 +240,9 @@
 (check-error (steganographie-enc (list (make-color 0 0 0 0)) "Hi!" "password") "steganographie-enc: message too long")
 (check-error (steganographie-enc (list (make-color 0 0 0) (make-color 0 0 0) (make-color 0 0 0) (make-color 0 0 0)) "a" "abcdefghijklmnop") "steganographie-enc: message not terminated properly")
 
-
+;; steganographie-dec: (listof color) string -> string
+;; Explanation:
+;; Example:
 (define (steganographie-dec loc k)
   (local
     (;; process-pixels: (listof color) number -> (listof (listof number))
