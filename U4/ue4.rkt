@@ -72,14 +72,12 @@
 (check-expect (encodeable->string empty) "")
 
 
-
 ;; load-image: string -> (list of color)
 ;; Loads the image given by path-to-image and converts it to a list of color.
 ;; Example: (load-image "example.png") -> (list (color 128 255 32 255) ...)
 (define (load-image path-to-image)
-  true
-;;  (image->color-list (bitmap/file path-to-image))
-  )
+  (image->color-list (bitmap/file path-to-image))
+)
 
 ;; store-image: (list of color) string number number -> boolean
 ;; Saves the image in PNG format at path-to-image.
@@ -88,10 +86,8 @@
 ;; width: The width of the image.
 ;; heigth: The height of the image. 
 (define (store-image loc path-to-image width height)
-  true
-;;  (save-image (color-list->bitmap loc width height) path-to-image)
-  )
-
+  (save-image (color-list->bitmap loc width height) path-to-image)
+)
 
 
 ;; char-to-int: string -> number
@@ -180,14 +176,27 @@
 (check-expect (char-in-color (make-color 255 255 255 255) (list 0 1 2 3)) (make-color 252 253 254 255))
 (check-expect (char-in-color (make-color 0 0 0 0) (list 3 1 2 0)) (make-color 3 1 2 0))
 
-;; steganographie-enc:
+;; char-from-color: color -> (listof number)
+;; Explanation:
+;; Example:
+(define (char-from-color col)
+  (local
+    ((define r (color-red col))
+     (define g (color-green col))
+     (define b (color-blue col))
+     (define a (color-alpha col)))
+    (list (modulo r 4) (modulo g 4) (modulo b 4) (modulo a 4))
+  )
+)
+(check-expect (char-from-color (make-color 252 253 254 255)) (list 0 1 2 3))
+(check-expect (char-from-color (make-color 3 1 2 0)) (list 3 1 2 0))
+
+;; steganographie-enc: (listof color) string string -> (listof color)
 ;; Explanation:
 ;; Example:
 (define (steganographie-enc loc m k)
   (local
-    (
-     
-     ;; padd-to-four: (listof number) -> (listof number)
+    (;; padd-to-four: (listof number) -> (listof number)
      ;; Explanation:
      ;; Example:
      (define (padd-to-four lst)
@@ -208,7 +217,8 @@
      (define (process-pixels loc index message)
        (cond
          [(empty? loc) (if (empty? message) empty (error 'steganographie-enc "message too long (inner check failed)"))] ;; If I got this right it should never happen...
-         [(and (not (empty? message)) (quick-contains index password))
+         [(empty? message) loc] ;; If message is fully processed, rest of the image remains unchanged
+         [(quick-contains index password)
           (cons (char-in-color (first loc) (first message)) (process-pixels (rest loc) (modulo (+ index 1) 26) (rest message)))]
          [else (cons (first loc) (process-pixels (rest loc) (modulo (+ index 1) 26) message))]
        )
@@ -218,12 +228,46 @@
     (cond
       [(empty? loc) (error 'steganographie-enc "input image data is empty")]
       [(< (length loc) (* (/ (length msg) (length password)) 26)) (error 'steganographie-enc "message too long")]
-      [else true]
+      [(not (equal? (first (reverse msg)) (list 0 1 2 3))) (error 'steganographie-enc "message not terminated properly")]
+      [else (process-pixels loc 0 msg)]
     )
   )
 )
 
+;; Tests
+(check-error (steganographie-enc empty "" "") "steganographie-enc: input image data is empty")
+(check-error (steganographie-enc (list (make-color 0 0 0 0)) "Hi!" "password") "steganographie-enc: message too long")
+(check-error (steganographie-enc (list (make-color 0 0 0) (make-color 0 0 0) (make-color 0 0 0) (make-color 0 0 0)) "a" "abcdefghijklmnop") "steganographie-enc: message not terminated properly")
+
 
 (define (steganographie-dec loc k)
-  true
+  (local
+    (;; process-pixels: (listof color) number -> (listof (listof number))
+     ;; Explanation:
+     ;; Example:
+     (define (process-pixels loc index)
+       (cond
+         [(empty? loc) empty]
+         [(quick-contains index password)
+          (if (equal? (char-from-color (first loc)) (list 0 1 2 3))
+              (list (char-from-color (first loc))) ;; Abort on \e, message is completed
+              (cons (char-from-color (first loc)) (process-pixels (rest loc) (modulo (+ index 1) 26)))
+          )
+         ]
+         [else (process-pixels (rest loc) (modulo (+ index 1) 26))]
+       )
+     )
+     (define password (normalize-pw k)))
+    (cond
+      [(empty? loc) (error 'steganographie-dec "input image data is empty")]
+      [else (encodeable->string (process-pixels loc 0))]
+    )
+  )
 )
+
+;; Tests (also tests encryption)
+(check-error (steganographie-dec empty "") "steganographie-dec: input image data is empty")
+(check-expect (steganographie-dec (steganographie-enc (load-image "chaos.png") "Chaos is Order yet undeciphered.\e" "enemy") "enemy") "Chaos is Order yet undeciphered.\e")
+
+;; Recovered Message
+;; Suchen Sie sich ein Bild um Ihren Namen, wie er in Moodle steht, in diesem Bild zu verstecken. Benutzen Sie als Passwort "encrypt". Geben Sie das Bild und Ihren Code als ein Zip-Archive ab.
