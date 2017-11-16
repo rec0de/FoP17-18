@@ -265,9 +265,9 @@
   )
 )
 
-;; Tests (also tests encryption)
+;; Tests
 (check-error (steganographie-dec empty "") "steganographie-dec: input image data is empty")
-(check-expect (steganographie-dec (steganographie-enc (load-image "chaos.png") "Chaos is Order yet undeciphered.\e" "enemy") "enemy") "Chaos is Order yet undeciphered.\e")
+(check-expect (steganographie-dec (load-image "chimera.png") "wisdom") "Chaos is Order yet undeciphered.\e")
 
 ;; Recovered Message
 ;; Suchen Sie sich ein Bild um Ihren Namen, wie er in Moodle steht, in diesem Bild zu verstecken. Benutzen Sie als Passwort "encrypt". Geben Sie das Bild und Ihren Code als ein Zip-Archive ab.
