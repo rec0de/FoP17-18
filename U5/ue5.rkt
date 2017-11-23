@@ -68,19 +68,104 @@
 (check-expect (linear-interpolation 3 500 0) 3)
 (check-expect (linear-interpolation 5 10 0.1) 5.5)
 
+;; nth-element: (listof X) number -> X
+;; Explanation:
+;; Example:
+(define (nth-element lst index)
+  (cond
+    [(empty? lst) (error 'nth-element "can't access nonexistant index of list")] ;; index not in list
+    [(zero? index) (first lst)] ;; index references first element
+    [else (nth-element (rest lst) (- index 1))]
+  )
+)
+;; Tests
+(check-expect (nth-element (list 'r 'k 'b 'n 'e 'o) 3) 'n)
+(check-expect (nth-element (list 1 2 3 4 5 6 7) 1) 2)
+(check-error (nth-element (list 'a 'l 'l) 5) "nth-element: can't access nonexistant index of list")
 
+;; scalar-mult: vector2d vector2d -> number
+;; Explanation:
+;; Example:
+(define (scalar-mult vec-a vec-b)
+  (+ (* (vector2d-x vec-a) (vector2d-x vec-b)) (* (vector2d-y vec-a) (vector2d-y vec-b)))
+)
+;; Tests
+(check-expect (scalar-mult (make-vector2d 0 0) (make-vector2d 523 5712)) 0)
+(check-expect (scalar-mult (make-vector2d 1 2) (make-vector2d -7 8)) 9)
 
+;; dot-grid-gradient: number number number number -> number
+;; Explanation:
+;; Example:
 (define (dot-grid-gradient ix iy x y)
-  true
+  (local
+    ;; coords2gradient: number number -> vector2d
+    ;; Explanation:
+    ;; Example:
+    ((define (coords2gradient x y)
+       (nth-element gradients (+ (* y GWIDTH) x)) ;; index of gradient is x + y*gradients_per_row
+    ))
+    (scalar-mult (coords2gradient x y) (make-vector2d (- ix x) (- iy y)))
+  )
 )
+;; Tests
 
 
+;; perlin-noise: number number -> number
+;; Explanation:
+;; Example: (not specified)
 (define (perlin-noise x y)
-  true
+  (local
+    ((define rx (/ x SCALE))
+     (define ry (/ y SCALE))
+     (define top-left (dot-grid-gradient rx ry (floor rx) (floor ry)))
+     (define top-right (dot-grid-gradient rx ry (ceiling rx) (floor ry)))
+     (define bot-left (dot-grid-gradient rx ry (floor rx) (ceiling ry)))
+     (define bot-right (dot-grid-gradient rx ry (ceiling rx) (ceiling ry)))
+     (define top (linear-interpolation top-left top-right (fade (- rx (floor rx)))))
+     (define bot (linear-interpolation bot-left bot-right (fade (- rx (floor rx)))))
+     (define final (linear-interpolation top bot (fade (- ry (floor ry)))))
+    )
+    (+ (/ final 2) 0.5) ;; Scale final value from -1..1 to 0..1
+  ) 
 )
+;; Tests
+(check-within (perlin-noise (* (random) WIDTH) (* (random) HEIGHT)) 0.5 0.5)
 
+;; create-land: number number -> (listof color)
+;; Explanation:
+;; Example:
 (define (create-land width height)
-  true
+  (local
+    (
+     (define deepsea (make-color 19 64 116))
+     (define sea (make-color 32 164 243))
+     (define beach (make-color 244 208 111))
+     (define grasslands (make-color 122 229 130))
+     (define grasslands2 (make-color 100 188 107))
+     (define grasslands3 (make-color 78 146 83))
+     (define mountains (make-color 52 052 52))
+     (define snow (make-color 200 200 200))
+     ;; number2color: number -> color
+     ;; Explanation: Converts a number between 0 and 1 to a color by interpreting the number as terrain height
+     ;; Example:
+     (define (number2color num)
+       (cond
+         [(< num 0.32) deepsea] ;; Deep Sea
+         [(< num 0.38) sea] ;; Sea
+         [(< num 0.45) beach] ;; Beach
+         [(< num 0.52) grasslands] ;; Grasslands
+         [(< num 0.59) grasslands2] 
+         [(< num 0.65) grasslands3]
+         [(< num 0.74) mountains] ;; Mountains
+         [else snow]
+       )
+     )
+    )
+    ;; Lambda: number -> color
+    ;; Explanation:
+    ;; Example:
+    (build-list (* width height) (lambda (index) (number2color (perlin-noise (modulo index WIDTH) (floor (/ index WIDTH)))))) ;; x y coords are index mod width and integer part of index/width
+  )
 )
 
-;(save-image (color-list->bitmap (create-land WIDTH HEIGHT) WIDTH HEIGHT) "land.png")
+(save-image (color-list->bitmap (create-land WIDTH HEIGHT) WIDTH HEIGHT) "land.png")
