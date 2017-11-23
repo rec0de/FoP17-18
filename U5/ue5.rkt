@@ -18,8 +18,8 @@
 (define-struct vector2d (x y))
 
 ;; create-gradients: number -> (listof vector2d)
-;; Explanation:
-;; Example:
+;; Explanation: Generates n random vectors of length 1
+;; Example: (create-gradients 1) -> (list (make-vector2d #i0.055253518154322646 #i0.9984723575200116))
 (define (create-gradients n)
   (local
     ;; ranVec: X -> vector2d
@@ -58,8 +58,8 @@
 
 
 ;; linear-interpolation: number number number -> number
-;; Explanation:
-;; Example:
+;; Explanation: Calculates weighted interpolated value between x and y
+;; Example: (linear-interpolation 0 10 0.25) ->  2.5
 (define (linear-interpolation x y w)
  (+ (* (- 1 w) x) (* w y))    
 )
@@ -69,8 +69,8 @@
 (check-expect (linear-interpolation 5 10 0.1) 5.5)
 
 ;; nth-element: (listof X) number -> X
-;; Explanation:
-;; Example:
+;; Explanation: Returns the n-th element of given list, starting at zero. Error on out-of-bounds index
+;; Example: (nth-element (list 1 2 3) 0) -> 1
 (define (nth-element lst index)
   (cond
     [(empty? lst) (error 'nth-element "can't access nonexistant index of list")] ;; index not in list
@@ -84,8 +84,8 @@
 (check-error (nth-element (list 'a 'l 'l) 5) "nth-element: can't access nonexistant index of list")
 
 ;; scalar-mult: vector2d vector2d -> number
-;; Explanation:
-;; Example:
+;; Explanation: Returns scalar product of two 2d vectors
+;; Example: (scalar-mult (make-vector2d 1 2) (make-vector2d 3 3)) -> 9
 (define (scalar-mult vec-a vec-b)
   (+ (* (vector2d-x vec-a) (vector2d-x vec-b)) (* (vector2d-y vec-a) (vector2d-y vec-b)))
 )
@@ -94,13 +94,13 @@
 (check-expect (scalar-mult (make-vector2d 1 2) (make-vector2d -7 8)) 9)
 
 ;; dot-grid-gradient: number number number number -> number
-;; Explanation:
-;; Example:
+;; Explanation: Calculates scalar product of a gradient specified by coordinates and the vector between that gradient and the specified pixel
+;; Example: (dot-grid-gradient 30 30 0 0) -> -23.96...
 (define (dot-grid-gradient ix iy x y)
   (local
     ;; coords2gradient: number number -> vector2d
-    ;; Explanation:
-    ;; Example:
+    ;; Explanation: Returns gradient of a given grid intersection by looking up in gradients list
+    ;; Example: (coords2gradient 2 1) -> [random gradient vector at list position 17]
     ((define (coords2gradient x y)
        (nth-element gradients (+ (* y GWIDTH) x)) ;; index of gradient is x + y*gradients_per_row
     ))
@@ -108,10 +108,11 @@
   )
 )
 ;; Tests
-
+;; (not specified)
 
 ;; perlin-noise: number number -> number
-;; Explanation:
+;; Explanation: Calculates the perlin-noise value for a given pixel by looking up all corner gradients and interpolating values
+;;              Output is scaled to range 0-1
 ;; Example: (not specified)
 (define (perlin-noise x y)
   (local
@@ -132,11 +133,12 @@
 (check-within (perlin-noise (* (random) WIDTH) (* (random) HEIGHT)) 0.5 0.5)
 
 ;; create-land: number number -> (listof color)
-;; Explanation:
-;; Example:
+;; Explanation: Creates a list of colors representing a width*height image colored according to the perlin-noise value of each pixel
+;; Example: (not specified)
 (define (create-land width height)
   (local
     (
+     ;; Color definitions
      (define deepsea (make-color 19 64 116))
      (define sea (make-color 32 164 243))
      (define beach (make-color 244 208 111))
@@ -147,7 +149,7 @@
      (define snow (make-color 200 200 200))
      ;; number2color: number -> color
      ;; Explanation: Converts a number between 0 and 1 to a color by interpreting the number as terrain height
-     ;; Example:
+     ;; Example: (number2color 0.4) -> beach -> (make-color 244 208 111)
      (define (number2color num)
        (cond
          [(< num 0.32) deepsea] ;; Deep Sea
@@ -162,10 +164,12 @@
      )
     )
     ;; Lambda: number -> color
-    ;; Explanation:
-    ;; Example:
+    ;; Explanation: Converts the index of a pixel to its coordinates and returns the color corresponding to the perlin-noise value of that pixel
+    ;; Example: 578 -> (make-color 32 164 243)
     (build-list (* width height) (lambda (index) (number2color (perlin-noise (modulo index WIDTH) (floor (/ index WIDTH)))))) ;; x y coords are index mod width and integer part of index/width
   )
 )
+;; Tests
+;; (not specified)
 
-(save-image (color-list->bitmap (create-land WIDTH HEIGHT) WIDTH HEIGHT) "land.png")
+;;(save-image (color-list->bitmap (create-land WIDTH HEIGHT) WIDTH HEIGHT) "land.png")
