@@ -141,7 +141,7 @@
   (local
     (
      ;; Color definitions
-     (define deepsea (make-color 19 64 116))
+     (define deepsea (make-color 24 120 177))
      (define sea (make-color 32 164 243))
      (define beach (make-color 244 208 111))
      (define grasslands (make-color 122 229 130))
@@ -223,14 +223,14 @@
   (local
     (
      ;; Color definitions
-     (define deepsea (make-color 78 255 239));24 120 177))
-     (define sea (make-color 78 255 239));32 164 243))
-     (define beach (make-color  120 227 253));244 208 111))
-     (define grasslands (make-color 169 237 253));122 229 130))
-     (define grasslands2 (make-color 255 238 238));100 188 107))
-     (define grasslands3 (make-color 255 187 221));78 146 83))
-     (define mountains (make-color 255 119 153));52 052 52))
-     (define snow (make-color 255 143 171));200 200 200))
+     (define deepsea (make-color 24 120 177))
+     (define sea (make-color 32 164 243))
+     (define beach (make-color 244 208 111))
+     (define grasslands (make-color 122 229 130))
+     (define grasslands2 (make-color 100 188 107))
+     (define grasslands3 (make-color 78 146 83))
+     (define mountains (make-color 52 052 52))
+     (define snow (make-color 200 200 200))
      ;; number2color: number -> color
      ;; Explanation: Converts a number between 0 and 1 to a color by interpreting the number as terrain height
      ;; Example: (number2color 0.4) -> beach -> (make-color 244 208 111)
