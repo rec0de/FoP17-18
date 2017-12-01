@@ -8,9 +8,18 @@
 ;; Explanation: Converts positive (strictly > 0) base10 integer numbers to their base4 representation, returned as a list of numbers representing single digits
 ;; Example: (convert-to-base-four 4) -> (list 1 0)
 (define (convert-to-base-four num)
-  (cond
-    [(zero? num) empty]
-    [else (append (convert-to-base-four (quotient num 4)) (list (modulo num 4)))]
+  (local
+    ;; c2b4: number -> (listof number)
+    ;; Explanation: Converts a positive integer to its base4 representation. Empty list on zero
+    ;; Example: (c2b4 4) -> (list 1 0)
+    ((define (c2b4 num)
+       (cond
+         [(zero? num) empty]
+         [else (append (c2b4 (quotient num 4)) (list (modulo num 4)))]
+       )
+    )
+    (define res (c2b4 num)))
+    (if (empty? res) (list 0) res) ;; Return list containing zero instead of empty list on zero
   )
 )
 
@@ -18,7 +27,7 @@
 (check-expect (convert-to-base-four 10) (list 2 2)) ;; pre-defined
 (check-expect (convert-to-base-four 100) (list 1 2 1 0)) ;; pre-defined
 (check-expect (convert-to-base-four 812) (list 3 0 2 3 0))
-;;(check-expect (convert-to-base-four 0) (list 0))
+(check-expect (convert-to-base-four 0) (list 0))
 
 
 
@@ -45,7 +54,7 @@
 ;; Example: (string->encodeable "ABC") -> (list (list 1 0 0 1) (list 1 0 0 2) (list 1 0 0 3))
 (define (string->encodeable s)
   ;; Lambda: string -> (listof number)
-  ;; Explanation:
+  ;; Explanation: Converts a character to its ASCII code in base4
   ;; Example: A -> (list 1 0 0 1)
   (map (lambda (s) (convert-to-base-four (string->int s))) (explode s))
 )
@@ -193,13 +202,13 @@
 (check-expect (char-from-color (make-color 3 1 2 0)) (list 3 1 2 0))
 
 ;; steganographie-enc: (listof color) string string -> (listof color)
-;; Explanation:
-;; Example:
+;; Explanation: Hides a specified message string in an image given as a list of color values, using a password for "encryption"
+;; Example: (not specified)
 (define (steganographie-enc loc m k)
   (local
     (;; padd-to-four: (listof number) -> (listof number)
-     ;; Explanation:
-     ;; Example:
+     ;; Explanation: Padds a given non-empty list of <= 4 elements to exactly 4 elements by prepending zeroes
+     ;; Example: (padd-to-four (list 1 2)) -> (list 0 0 1 2)
      (define (padd-to-four lst)
        (cond
          ;; Not gonna make that recursive...
@@ -213,8 +222,8 @@
      )
     
      ;; process-pixels: (listof color) number (listof (listof number)) -> (listof color)
-     ;; Explanation:
-     ;; Example:
+     ;; Explanation: Loops over all image pixels and returns modified pixel list with embedded message
+     ;; Example: (process-pixels loc 0 "Nothing much to say") -> [the same loc but with the message embedded]
      (define (process-pixels loc index message)
        (cond
          [(empty? loc) (if (empty? message) empty (error 'steganographie-enc "message too long (inner check failed)"))] ;; If I got this right it should never happen...
@@ -241,13 +250,13 @@
 (check-error (steganographie-enc (list (make-color 0 0 0) (make-color 0 0 0) (make-color 0 0 0) (make-color 0 0 0)) "a" "abcdefghijklmnop") "steganographie-enc: message not terminated properly")
 
 ;; steganographie-dec: (listof color) string -> string
-;; Explanation:
-;; Example:
+;; Explanation: Decrypts a message from a given image by extracting characters from the least significant bits of each pixel specified by a given password
+;; Example: (not specified)
 (define (steganographie-dec loc k)
   (local
     (;; process-pixels: (listof color) number -> (listof (listof number))
-     ;; Explanation:
-     ;; Example:
+     ;; Explanation: Extracts a message from a given list of colors by looping over all elements, aborts on escape character
+     ;; Example: (process-pixels loc 0) -> "Whatever message was in there\e"
      (define (process-pixels loc index)
        (cond
          [(empty? loc) empty]
