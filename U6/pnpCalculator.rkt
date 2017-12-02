@@ -27,7 +27,7 @@
                      (%CH 1)))
 
 ;; eval-expression: symbol number number -> number
-;; Explanation:
+;; Explanation: Returns result of multipication/addition/subtraction/division of two numbers given the proper operand symbol
 ;; Example: (eval-expression + 1 2) -> 3
 (define (eval-expression operator n1 n2)
   (cond
@@ -48,7 +48,7 @@
 
 
 ;; dice: number -> number
-;; Explanation:
+;; Explanation: Simulates a dice roll with given number of sides
 ;; Example: (dice 6) -> 5
 (define (dice sides)
   (inexact->exact (ceiling (* (random) sides)))
@@ -59,10 +59,13 @@
 
 
 ;; eval-pnp-expression: pnp-expression (listof (list symbol number)) -> number
-;; Explanation:
-;; Example:
+;; Explanation: Evaluates a pnp-expression to its numeric value recursively, replacing attributes with the supplied values
+;; Example: (eval-pnp-expression 'w6 '()) -> 4 [= (dice 6)]
 (define (eval-pnp-expression pnp-exp attr-values)
   (local
+    ;; find-attr: (listof (listof symbol X)) -> X
+    ;; Explanation: Returns the second element of the list in the given list that has needle as its first element
+    ;; Example: (find-attr 'hereiam '((whereisit 5)(cantfind 7)(hereiam 2))) -> 2
     ((define (find-attr needle haystack)
        (cond
          [(empty? haystack) (error 'find-attr "couldn't find attribute value")]
@@ -100,8 +103,9 @@
 (check-error (eval-pnp-expression 'falltopieces! attributes) "find-attr: couldn't find attribute value")
 
 ;; eval-pnp-tree: pnp-tree (listof (list symbol number)) -> number
-;; Explanation:
-;; Example:
+;; Explanation: Evaluates a given pnp-tree to its numerical value, replacing attributes with given values
+;;              Technically a stricter version of eval-pnp-expression that does not allow non-tree pnp-expressions (on paper, this one handles them the same way eval-pnp-expression does)
+;; Example: (eval-pnp-tree (make-pnp-tree '* '%CH 6)) -> 6
 (define (eval-pnp-tree pnp-tree attr-values)
   (eval-pnp-expression pnp-tree attr-values) ;; I don't really get how these functions are supposed to be different, but here you go
 )
@@ -112,8 +116,9 @@
 (check-expect (eval-pnp-tree (make-pnp-tree '* 10 (make-pnp-tree '+ 5 -4)) attributes) 10)
 (check-expect (eval-pnp-tree (make-pnp-tree '* '%ST (make-pnp-tree '- '%CO 4)) attributes) -8)
 
-;; list->pnp-tree: (list of symbol) -> pnp-tree
-;; Explanation:
+;; list->pnp-tree: (list of symbol symbol/number/list symbol/number/list) -> pnp-tree
+;; Explanation: Converts a list of lists with lists consisting of an operatorsymbol  and two operator values (number/symbol/list) to a corresponding pnp-tree
+;;              Error on empty input
 ;; Example: (list->pnp-tree '(+ 1 w4)) -> (make-pnp-tree '+ 1 'w4)
 (define (list->pnp-tree los)
   (cond
@@ -129,8 +134,8 @@
 (check-error (list->pnp-tree '()) "list->pnp-tree: can't create empty pnp-tree")
 
 ;; valid-operator?: symbol or string -> boolean
-;; Explanation:
-;; Example:
+;; Explanation: Checks if a given string or symbol represents a supported operator (*+/-) and returns true/false accordingly
+;; Example: (valid-operator? '/) -> true
 (define (valid-operator? input)
   (cond
     [(symbol? input) (or (symbol=? input '+) (symbol=? input '*) (symbol=? input '/) (symbol=? input '-))]
@@ -146,12 +151,12 @@
 
 ;; combine-strings: (listof string) -> (listof string)
 ;; Explanation:
-;; Example: 
+;; Example: (combine-strings (list "t" "h" "r" "o" "w" "+" "a" "w" "a" "y")) -> (list "throw" "+" "away")
 (define (combine-strings los)
   (local
     ;; combine: (listof string) (listof string) string -> (listof string)
     ;; Explanation:
-    ;; Example: (combine (list "t" "h" "r" "o" "w" "+" "a" "w" "a" "y") -> (list "away" "+" "throw")
+    ;; Example: (combine (list "t" "h" "r" "o" "w" "+" "a" "w" "a" "y")) -> (list "away" "+" "throw")
     ((define (combine todo res cache)
        (cond
          [(empty? todo) (cons cache res)]
