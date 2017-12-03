@@ -134,42 +134,44 @@
 ;; Tests
 (check-within (perlin-noise (* (random) WIDTH) (* (random) HEIGHT)) 0.5 0.5)
 
+;; Pulling color definitions to global scope for easier modification
+;; Color definitions
+(define deepsea (make-color 24 120 177))
+(define sea (make-color 32 164 243))
+(define beach (make-color 244 208 111))
+(define grasslands (make-color 122 229 130))
+(define grasslands2 (make-color 100 188 107))
+(define grasslands3 (make-color 78 146 83))
+(define mountains (make-color 52 052 52))
+(define snow (make-color 200 200 200))
+
+;; number2color: number -> color
+;; Explanation: Converts a number between 0 and 1 to a color by interpreting the number as terrain height
+;; Example: (number2color 0.4) -> beach -> (make-color 244 208 111)
+(define (number2color num)
+  (cond
+    [(< num 0.32) deepsea] ;; Deep Sea
+    [(< num 0.38) sea] ;; Sea
+    [(< num 0.45) beach] ;; Beach
+    [(< num 0.52) grasslands] ;; Grasslands
+    [(< num 0.59) grasslands2] 
+    [(< num 0.65) grasslands3]
+    [(< num 0.74) mountains] ;; Mountains
+    [else snow]
+  )
+)
+;; Tests
+(check-expect (number2color 0.5) grasslands)
+(check-expect (number2color 0.8) snow)
+
 ;; create-land: number number -> (listof color)
 ;; Explanation: Creates a list of colors representing a width*height image colored according to the perlin-noise value of each pixel
 ;; Example: (not specified)
 (define (create-land width height)
-  (local
-    (
-     ;; Color definitions
-     (define deepsea (make-color 24 120 177))
-     (define sea (make-color 32 164 243))
-     (define beach (make-color 244 208 111))
-     (define grasslands (make-color 122 229 130))
-     (define grasslands2 (make-color 100 188 107))
-     (define grasslands3 (make-color 78 146 83))
-     (define mountains (make-color 52 052 52))
-     (define snow (make-color 200 200 200))
-     ;; number2color: number -> color
-     ;; Explanation: Converts a number between 0 and 1 to a color by interpreting the number as terrain height
-     ;; Example: (number2color 0.4) -> beach -> (make-color 244 208 111)
-     (define (number2color num)
-       (cond
-         [(< num 0.32) deepsea] ;; Deep Sea
-         [(< num 0.38) sea] ;; Sea
-         [(< num 0.45) beach] ;; Beach
-         [(< num 0.52) grasslands] ;; Grasslands
-         [(< num 0.59) grasslands2] 
-         [(< num 0.65) grasslands3]
-         [(< num 0.74) mountains] ;; Mountains
-         [else snow]
-       )
-     )
-    )
-    ;; Lambda: number -> color
-    ;; Explanation: Converts the index of a pixel to its coordinates and returns the color corresponding to the perlin-noise value of that pixel
-    ;; Example: 578 -> (make-color 32 164 243)
-    (build-list (* width height) (lambda (index) (number2color (perlin-noise (modulo index WIDTH) (floor (/ index WIDTH)))))) ;; x y coords are index mod width and integer part of index/width
-  )
+  ;; Lambda: number -> color
+  ;; Explanation: Converts the index of a pixel to its coordinates and returns the color corresponding to the perlin-noise value of that pixel
+  ;; Example: 578 -> (make-color 32 164 243)
+  (build-list (* width height) (lambda (index) (number2color (perlin-noise (modulo index WIDTH) (floor (/ index WIDTH)))))) ;; x y coords are index mod width and integer part of index/width
 )
 ;; Tests
 ;; (not specified)
@@ -181,15 +183,6 @@
 ;; Not really relevant, but cool either way ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; quick-dot-grid-gradient: number number number number vector2d -> number
-;; Explanation: Calculates scalar product of a gradient given as a vector and the vector between that gradient and the specified pixel (saves time by not looking up gradient by coords)
-;; Example: (quick-dot-grid-gradient 30 30 0 0 (make-vector2d #i0.5107958369498081 #i0.8597020489418092)) -> 41.11...
-(define (quick-dot-grid-gradient ix iy x y gradient)
-  (scalar-mult gradient (make-vector2d (- ix x) (- iy y)))
-)
-;; Tests
-;; (not specified)
-
 ;; perlin-noise-on-steroids: number number vector2d vector2d vector2d vector2d -> number
 ;; Explanation: Calculates the perlin-noise value for a given pixel using given corner gradients to reduce runtime
 ;;              Output is scaled to range 0-1
@@ -200,15 +193,10 @@
      (define fry (floor ry))
      (define crx (ceiling rx))
      (define cry (ceiling ry))
-     (define top-left (quick-dot-grid-gradient rx ry frx fry corner-top-left))
-     (define top-right (quick-dot-grid-gradient rx ry crx fry corner-top-right))
-     (define bot-left (quick-dot-grid-gradient rx ry frx cry corner-bot-left))
-     (define bot-right (quick-dot-grid-gradient rx ry crx cry corner-bot-right))
-     (define top (linear-interpolation top-left top-right (fade (- rx frx))))
-     (define bot (linear-interpolation bot-left bot-right (fade (- rx frx))))
-     (define final (linear-interpolation top bot (fade (- ry fry))))
+     (define top (linear-interpolation (scalar-mult corner-top-left (make-vector2d (- rx frx) (- ry fry))) (scalar-mult corner-top-right (make-vector2d (- rx crx) (- ry fry))) (fade (- rx frx))))
+     (define bot (linear-interpolation (scalar-mult corner-bot-left (make-vector2d (- rx frx) (- ry cry))) (scalar-mult corner-bot-right (make-vector2d (- rx crx) (- ry cry))) (fade (- rx frx))))
     )
-    (+ (/ final 2) 0.5) ;; Scale final value from -1..1 to 0..1
+    (+ (/ (linear-interpolation top bot (fade (- ry fry))) 2) 0.5) ;; Scale final value from -1..1 to 0..1
   ) 
 )
 ;; Tests
@@ -222,30 +210,6 @@
 (define (create-land-and-hurry width height)
   (local
     (
-     ;; Color definitions
-     (define deepsea (make-color 24 120 177))
-     (define sea (make-color 32 164 243))
-     (define beach (make-color 244 208 111))
-     (define grasslands (make-color 122 229 130))
-     (define grasslands2 (make-color 100 188 107))
-     (define grasslands3 (make-color 78 146 83))
-     (define mountains (make-color 52 052 52))
-     (define snow (make-color 200 200 200))
-     ;; number2color: number -> color
-     ;; Explanation: Converts a number between 0 and 1 to a color by interpreting the number as terrain height
-     ;; Example: (number2color 0.4) -> beach -> (make-color 244 208 111)
-     (define (number2color num)
-       (cond
-         [(< num 0.32) deepsea] ;; Deep Sea
-         [(< num 0.38) sea] ;; Sea
-         [(< num 0.45) beach] ;; Beach
-         [(< num 0.52) grasslands] ;; Grasslands
-         [(< num 0.59) grasslands2] 
-         [(< num 0.65) grasslands3]
-         [(< num 0.74) mountains] ;; Mountains
-         [else snow]
-       )
-     )
      ;; coords2gradient: number number -> vector2d
      ;; Explanation: Returns gradient of a given grid intersection by looking up in gradients list
      ;; Example: (coords2gradient 2 1) -> [random gradient vector at list position 17]
@@ -290,26 +254,21 @@
          (recalc!)
        )
      )
-     ;; create-pixels: number -> (listof color)
-     ;; Explanation: Creates a list of width*height color elements corresponding to perlin-noise values. Parameter is used for counting and initialized at zero
-     ;; Example: (create-pixels 0) -> [list of width*height color structs]
-     (define (create-pixels index)
-       (if (= index (* width height)) empty
-           (cons
-            (local
-              ((define x (/ (modulo index WIDTH) SCALE))
-               (define y (/ (floor (/ index WIDTH)) SCALE)))
-              (begin
-                (if (or (>= x (+ cur-x 0.5)) (= 0 x)) (inc-x! x) (if (>= y (+ cur-y 0.5)) (inc-y!) false)) ;; Borderline magic - keeps cached gradients fresh
-                (number2color (perlin-noise-on-steroids x y cur-top-left cur-top-right cur-bot-left cur-bot-right))
-              )
-            )
-            (create-pixels (+ index 1))
-           )
+     ;; create-pixels: number -> color
+     ;; Explanation: Creates a color element corresponding to perlin-noise value of the pixel at index.
+     ;; Example: (create-pixel 0) -> (make-color ....)
+     (define (create-pixel index)
+       (local
+         ((define x (/ (modulo index WIDTH) SCALE))
+          (define y (/ (floor (/ index WIDTH)) SCALE)))
+         (begin
+           (if (or (>= x (+ cur-x 0.5)) (= 0 x)) (inc-x! x) (if (>= y (+ cur-y 0.5)) (inc-y!) false)) ;; Borderline magic - keeps cached gradients fresh
+           (number2color (perlin-noise-on-steroids x y cur-top-left cur-top-right cur-bot-left cur-bot-right))
+         )
        )
      )
     )
-    (create-pixels 0)
+    (build-list (* width height) create-pixel)
   )
 )
 ;; Tests
