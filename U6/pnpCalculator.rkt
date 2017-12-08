@@ -51,7 +51,7 @@
 ;; Explanation: Simulates a dice roll with given number of sides
 ;; Example: (dice 6) -> 5
 (define (dice sides)
-  (inexact->exact (ceiling (* (random) sides)))
+  (inexact->exact (ceiling (* (random) sides))) ;; doing this the cool way because we can
 )
 ;; Tests
 (check-random (dice 6) (+ 1 (random 6)))
@@ -150,7 +150,7 @@
 (check-expect (valid-operator? '._.) false)
 
 ;; combine-strings: (listof string) -> (listof string)
-;; Explanation:
+;; Explanation: Combines a list of single letter strings so that 'words' between 'operators' (+-*/) are joined into a single string
 ;; Example: (combine-strings (list "t" "h" "r" "o" "w" "+" "a" "w" "a" "y")) -> (list "throw" "+" "away")
 (define (combine-strings los)
   (local
@@ -174,9 +174,10 @@
 
 
 
-;; infix->prefix: string
-;; Explanation:
-;; Example:
+;; infix->prefix: string -> (listof symbol or number)
+;; Explanation: Converts a string representing a formula consisting of operators and non-operators in infix notation into a list of symbols representing operators and non-operators in prefix notation
+;;              Multiplication and Division have higher precedence than Addition and Subtraction, but inputs are interpreted to be _right_ associative
+;; Example: (infix->prefix "1+1*3") -> (list '+ 1 * 1 3)
 (define (infix->prefix str)
   (local
     ;; Split string into characters, combine words between operators, reverse result
@@ -197,8 +198,9 @@
      )
      
      ;; reorder: (listof string) (listof string) (listof string) -> (listof string)
-     ;; Explanation:
-     ;; Example:
+     ;; Explanation: Reorders the elements of the input list from infix notation to prefix notation. Stack and output are accumulators and initialized to empty.
+     ;;              Return value is the reversed (!) expression in prefix notation
+     ;; Example: (reorder (list "1" "+" "2") empty empty) -> (list "2" "1" "+")
      (define (reorder input stack output)
        (cond
          ;; Return output and stack on completition
@@ -222,16 +224,21 @@
 ;; Tests
 (check-expect (infix->prefix "1+2-3*4+5") (list '+ 1 '- 2 '+ '* 3 4 5)) ;; given testcase
 (check-expect (infix->prefix "f*t+n*h") (list '+ '* 'f 't '* 'n 'h))
+(check-expect (infix->prefix "3/2*2+1") (list '+ '/ 3 '* 2 2 1))
+;; additional testcase, copied from someone because it's just beautiful
+(check-expect (infix->prefix "1+2-3*4+5+1+2-3*4+5*1+2-3*4+5-1+2-3*4+5/1+2-3*4+5+1+2-3*4+5*1+2-3*4+5-1+2-3*4+5+1+2-3*4+5+1+2-3*4+5*1+2-3*4+5-1+2-3*4+5")(list '+ 1 '- 2 '+ '* 3 4 '+ 5 '+ 1 '- 2 '+ '* 3 4 '+ '* 5 1 '- 2 '+ '* 3 4 '- 5 '+ 1 '- 2 '+ '* 3 4 '+ '/ 5 1 '- 2 '+ '* 3 4 '+ 5 '+ 1 '- 2 '+ '* 3 4 '+ '* 5 1 '- 2 '+ '* 3 4 '- 5 '+ 1 '- 2 '+ '* 3 4 '+ 5 '+ 1 '- 2 '+ '* 3 4 '+ 5 '+ 1 '- 2 '+ '* 3 4 '+ '* 5 1 '- 2 '+ '* 3 4 '- 5 '+ 1 '- 2 '+ '* 3 4 5))
 
 
 ;; prefix->list: (listof symbol/number) -> (listof symbol number/symbol/list number/symbol/list)
-;; Explanation:
-;; Example:
+;; Explanation: Converts a list of symbols or numbers representing an expression in prefix notation to a 'tree-like' nested list with one operator and two operands (list or number) per list
+;;              If the input only contains a single value, a list corresponding to the addition of that value and zero is returned to 'padd' the output to a full expression
+;; Example: (prefix->list '(+ + 1 2 3)) -> '(+ (+ 1 2) 3)
 (define (prefix->list los)
   (local
     ;; pack: (listof symbol/number) (listof (listof symbol number/symbol/list)) -> (listof symbol number/symbol/list number/symbol/list)
-    ;; Explanation:
-    ;; Example:
+    ;; Explanation: Packs a list of symbols into nested lists with an operator as a first and two operands (list or symbol) as second and third element
+    ;;              Accumulator stack is initialized to empty
+    ;; Example: (pack '(+ + 1 2 3) empty) -> '(+ (+ 1 2) 3)
     ((define (pack los stack)
        (cond
          [(and (empty? los) (= (length stack) 1)) (first stack)] ;; Return first stack element on completition
