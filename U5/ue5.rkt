@@ -2,11 +2,11 @@
 ;; about the language level of this file in a form that our tools can easily process.
 #reader(lib "htdp-advanced-reader.ss" "lang")((modname ue5) (read-case-sensitive #t) (teachpacks ((lib "image.rkt" "teachpack" "2htdp"))) (htdp-settings #(#t constructor repeating-decimal #t #t none #f ((lib "image.rkt" "teachpack" "2htdp")) #f)))
 ;; Width of the final picture
-(define WIDTH 512)
+(define WIDTH (* 1920 2))
 ;; Height of the final picture
-(define HEIGHT 512)
+(define HEIGHT (* 1080 2))
 ;; Number of grid cells
-(define SCALE 64)
+(define SCALE (+ 256 128))
 ;; The width of the grid
 (define GWIDTH (ceiling (/ WIDTH SCALE))) ;; Modified to allow image sizes where height / width aren't multiples of scale
 ;; The height of the grid
@@ -136,14 +136,14 @@
 
 ;; Pulling color definitions to global scope for easier modification
 ;; Color definitions
-(define deepsea (make-color 24 120 177))
-(define sea (make-color 32 164 243))
-(define beach (make-color 244 208 111))
-(define grasslands (make-color 122 229 130))
-(define grasslands2 (make-color 100 188 107))
-(define grasslands3 (make-color 78 146 83))
-(define mountains (make-color 52 052 52))
-(define snow (make-color 200 200 200))
+(define deepsea (make-color 78 255 239));24 120 177))
+(define sea (make-color 78 255 239));32 164 243))
+(define beach (make-color  120 227 253));244 208 111))
+(define grasslands (make-color 169 237 253));122 229 130))
+(define grasslands2 (make-color 255 238 238));100 188 107))
+(define grasslands3 (make-color 255 187 221));78 146 83))
+(define mountains (make-color 255 119 153));52 052 52))
+(define snow (make-color 255 143 171));200 200 200))
 
 ;; number2color: number -> color
 ;; Explanation: Converts a number between 0 and 1 to a color by interpreting the number as terrain height
