@@ -16,10 +16,10 @@ public class Main {
 		float[][] sharp = { { 0, -1, 0 }, { -1, 5, -1 }, { 0, -1, 0 } };
 		float[][] blur = { { 1 * 1 / 16f, 2 * 1 / 16f, 1 * 1 / 16f }, { 2 * 1 / 16f, 4 * 1 / 16f, 2 * 1 / 16f }, { 1 * 1 / 16f, 2 * 1 / 16f, 1 * 1 / 16f } };
 		
-		Image mandarine_sharp = filter.nonLinearFilterMedian(cat, 3);
-		//Image beer_median3 = filter.nonLinearFilterMedian(beer, 5);
+		//Image mandarine_sharp = filter.nonLinearFilterMedian(cat, 3);
+		Image beer_median3 = filter.linearFilter(beer, blur);
 		
-		mandarine_sharp.save("mandarine_med3.pgm");
+		//mandarine_sharp.save("mandarine_med3.pgm");
 	}
 
 }

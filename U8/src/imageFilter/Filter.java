@@ -41,7 +41,7 @@ public class Filter {
 					}
 				}
 				
-				filtered.setPixel(Math.max(Math.min(Math.round(newPixelBrightness), maxBrightness), 0), i, j);
+				filtered.setPixel(Math.max(Math.min((float) Math.floor(newPixelBrightness), maxBrightness), 0), i, j);
 			}
 		}
 
@@ -75,7 +75,7 @@ public class Filter {
 						neighbors.addPixel(pixels[effectiveY][effectiveX]);
 					}
 				}
-				filtered.setPixel(Math.max(Math.min(Math.round(neighbors.getMedian()), maxBrightness), 0), i, j);
+				filtered.setPixel(Math.max(Math.min((float) Math.floor(neighbors.getMedian()), maxBrightness), 0), i, j);
 			}
 		}
 
