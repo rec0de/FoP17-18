@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 /**
- * 
  * @author Florian Kadner, Nils Rollshausen
  * @version 2.0 20171212
  */
