@@ -16,7 +16,7 @@ public class ToBeImplemented {
      * @return true if the circles intersect, false otherwise
      */
     public static boolean intersect(float x1, float y1, float x2, float y2, float r){
-        return Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2)) < 2*r;
+        return Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2)) <= 2*r;
     }
 
     /**
@@ -50,6 +50,8 @@ public class ToBeImplemented {
 
     /**
      * Updates the movement vector of a given circle if a collision with screen borders is detected in order to make the circle 'bounce off' the border
+     * Does _not_ change movement direction if a collision is detected but the circle is already moving away from the collision
+     * (i.e. the movement inversion already happened in a previous tick but the collision is not cleared yet)
      * 
      * @param x X-coordinate of circle center point
      * @param y Y-coordinate of circle center point
@@ -61,8 +63,8 @@ public class ToBeImplemented {
      * @return Array of two floats representing new circle movement
      */
     public static float[] bounceOffWall(float x, float y, float radius, float width, int height, float dirX, float dirY) {
-    	boolean collidesX = x < radius || x > width - radius;
-    	boolean collidesY = y < radius || y > height - radius;
+    	boolean collidesX = (x < radius && dirX < 0) || (x > width - radius && dirX > 0); // Only trigger collision logic if current direction is 'wrong', i.e. facing the wall
+    	boolean collidesY = (y < radius && dirY < 0) || (y > height - radius && dirY > 0); // Fixes circles getting stuck when spawned halfway over screen border (rapidly switching movement directions)
     	if (collidesX && collidesY)
     		return new float[]{-dirX, -dirY}; // Special case for that sweet dvd screensaver collision :)
     	else if (collidesX)
