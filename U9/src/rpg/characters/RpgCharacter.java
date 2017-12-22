@@ -4,8 +4,8 @@ import rpg.items.Item;
 import rpg.skills.Skill;
 
 /**
+ * RPG Character Base class - implements getter / setter method for attributes as well as attack / defense logic
  * @author Nils Rollshausen
- *
  */
 public abstract class RpgCharacter implements ICharacter {
 	
@@ -113,5 +113,29 @@ public abstract class RpgCharacter implements ICharacter {
 		if(this.health <= 0) {
 			this.isAlive = false;
 		}
+	}
+	
+	public void normalAttack(RpgCharacter enemy) {
+		// Can't attack dead enemy
+		if(!enemy.getAlive())
+			return;
+		
+		enemy.receiveNormalDamage(this.getAttack());
+	}
+	
+	public void useSkill(RpgCharacter enemy) {
+		// No effect if character has no skill or too little mana
+		if(this.skill == null || this.mana < this.skill.getMpCosts())
+			return;
+		
+		this.mana -= this.skill.getMpCosts();
+		this.skill.use(enemy);
+		
+	}
+	
+	public String getCharacterStats() {
+		String res = "Class: " + this.getRpgClass() + " Hp: " + this.getCurrentHp() + " Mp: " + this.getCurrentMp() + " At: " + this.getAttack() + " Def: " + this.getDefense() + " ";
+		res += "Item: " + (this.item == null ? "_" : this.item.getName()) + " Skill: " + (this.skill == null ? "_" : this.skill.getName());
+		return res;
 	}
 }

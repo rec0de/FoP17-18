@@ -3,7 +3,6 @@ package rpg.characters;
 /**
  * 
  * @author Nils Rollshausen
- *
  */
 public class Mage extends RpgCharacter {
 

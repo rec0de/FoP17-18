@@ -1,8 +1,8 @@
 package rpg.items;
 
 /**
+ * Wand Class - Instance of Item with name Wand and 2 attack points
  * @author Nils Rollshausen
- *
  */
 public class Wand extends Item {
 

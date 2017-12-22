@@ -1,8 +1,8 @@
 package rpg.items;
 
 /**
+ * Sword Class - Instance of Item with name Sword and 15 attack points
  * @author Nils Rollshausen
- *
  */
 public class Sword extends Item {
 

@@ -1,8 +1,8 @@
 package rpg.items;
 
 /**
+ * Armor Class - Instance of Item with name Armor and 3 defense points
  * @author Nils Rollshausen
- *
  */
 public class Armor extends Item {
 
