@@ -1,7 +1,7 @@
 package rpg.characters;
 
 /**
- * 
+ * Mage Class - Instance of RPG Character with rpgClassName fixed to Mage
  * @author Nils Rollshausen
  */
 public class Mage extends RpgCharacter {

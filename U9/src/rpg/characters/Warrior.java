@@ -1,7 +1,7 @@
 package rpg.characters;
 
 /**
- * 
+ * Warrior Class - Instance of RPG Character with rpgClassName fixed to Warrior
  * @author Nils Rollshausen
  */
 public class Warrior extends RpgCharacter {
