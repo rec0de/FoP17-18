@@ -153,6 +153,10 @@ public abstract class RpgCharacter implements ICharacter {
 		this.skill = skill;
 	}
 	
+	/**
+	 * calculate the damage a character receives from a normal attack
+	 * @param normalDamage the damage of the enemy's normal attack
+	 */
 	public void receiveNormalDamage(int normalDamage) {
 		this.health += Math.min(0, this.getDefense() - normalDamage);
 		if(this.health <= 0) {
@@ -160,6 +164,11 @@ public abstract class RpgCharacter implements ICharacter {
 		}
 	}
 
+	/**
+	 * calculate the damage a character receives from a magic attack
+	 * magic damage ignores the defense of a character
+	 * @param magicDamage the magic damage of the enemy's magic attack
+	 */
 	public void receiveMagicDamage(int magicDamage) {
 		this.health -= Math.max(0, magicDamage);
 		if(this.health <= 0) {
@@ -167,6 +176,10 @@ public abstract class RpgCharacter implements ICharacter {
 		}
 	}
 	
+	/**
+	 * An attack against an enemy
+	 * @param enemy the enemy who gets attacked
+	 */
 	public void normalAttack(RpgCharacter enemy) {
 		// Can't attack dead enemy
 		if(!enemy.getAlive())
