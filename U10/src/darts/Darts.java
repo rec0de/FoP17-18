@@ -72,7 +72,14 @@ public abstract class Darts implements IDarts {
 	 */
 	@Override
 	public Player[] getPlayers() {
-		return this.players;
+		// players is statically initialized to maximum player count - we need to return an array containing _only_ players that actually joined the game
+		Player[] realPlayers = new Player[playerCount];
+
+		for(int i = 0; i < playerCount; i++) {
+			realPlayers[i] = players[i];
+		}
+
+		return realPlayers;
 	}
 	
 	/* (non-Javadoc)
@@ -120,7 +127,7 @@ public abstract class Darts implements IDarts {
 	 */
 	@Override
 	public boolean start() {
-		if(!isRunning && playerCount > 0) {
+		if(!isRunning && !isEnded && playerCount > 0) {
 			this.isRunning = true;
 			this.isEnded = false;
 			this.winner = null; // Reset in case of object reuse across games
@@ -132,6 +139,8 @@ public abstract class Darts implements IDarts {
 		else{
 			if(isRunning)
 				System.out.println("Error: Couldn't start game, game is already running");
+			else if(isEnded) 
+				System.out.println("Error: Couldn't start game, game has already ended");
 			else if(playerCount < 1) 
 				System.out.println("Error: Couldn't start game, game has no players");
 			else 
@@ -147,7 +156,7 @@ public abstract class Darts implements IDarts {
 	 */
 	@Override
 	public boolean throwDart(int number, int multiplier) {
-		if(!isRunning || isEnded) {
+		if(isEnded || !isRunning) {
 			System.out.println("Error: Invalid throw, game is not running");
 			return false;
 		}

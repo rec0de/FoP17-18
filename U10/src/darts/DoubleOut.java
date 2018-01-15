@@ -1,8 +1,9 @@
 package darts;
 
 /**
- * @author Nils Rollshausen
+ *  Class modeling a game of DoubleOut, implementing the IDarts interface
  *
+ * @author Nils Rollshausen
  */
 public class DoubleOut extends Darts {
 	
@@ -11,7 +12,8 @@ public class DoubleOut extends Darts {
 	private int scoreBeforeTurn;
 
 	/**
-	 * @param gamemode
+	 * Main constructor for DoubleOut Class - initializes a new DoubleOut game
+	 * @param startScore Initial score that is counted down from - traditionally 501
 	 * @param maxPlayers
 	 */
 	public DoubleOut(int maxPlayers, int startScore) {
@@ -58,17 +60,28 @@ public class DoubleOut extends Darts {
 		return true;
 	}
 	
+	/*
+	 * (non-Javadoc)
+	 * @see darts.Darts#handleNextPlayer()
+	 */
 	@Override
 	void handleNextPlayer() {
 		this.scoreBeforeTurn = scores[activePlayerIndex];
 	}
 	
 	/**
-	 * 
-	 * @return
+	 * Returns the current scores of all players as an array
+	 * @return Array of player scores
 	 */
 	public int[] getScore() {
-		return this.scores;
+		// scores is statically initialized to maximum player count - we need to return an array containing _only_ scores that are actually connected to players
+		int[] realScores = new int[playerCount];
+
+		for(int i = 0; i < playerCount; i++) {
+			realScores[i] = scores[i];
+		}
+
+		return realScores;
 	}
 
 }

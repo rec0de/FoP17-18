@@ -1,8 +1,9 @@
 package darts;
 
 /**
- * @author Nils Rollshausen
+ * Class modeling a game of Shanghai, implementing the IDarts interface
  *
+ * @author Nils Rollshausen
  */
 public class Shanghai extends Darts {
 	
@@ -15,7 +16,8 @@ public class Shanghai extends Darts {
 	private boolean currentTurnHasTriple;
 
 	/**
-	 * @param maxPlayers
+	 * Main constructor for Shanghai class - initializes new Shanghai game
+	 * @param maxPlayers Maximal number of players
 	 */
 	public Shanghai(int maxPlayers) {
 		super("Shanghai", maxPlayers);
@@ -76,10 +78,25 @@ public class Shanghai extends Darts {
 		}
 	}
 	
+	/**
+	 * Returns the current scores of all players as an array
+	 * @return Array of player scores
+	 */
 	public int[] getScore() {
-		return this.scores;
+		// scores is statically initialized to maximum player count - we need to return an array containing _only_ scores that are actually connected to players
+		int[] realScores = new int[playerCount];
+
+		for(int i = 0; i < playerCount; i++) {
+			realScores[i] = scores[i];
+		}
+
+		return realScores;
 	}
 	
+	/**
+	 * Advances the round counter by one and ends the game if 9 rounds have been played.
+	 * Sets game winner to player with the highest score on game end.
+	 */
 	private void nextRound() {
 		this.round += 1;
 		

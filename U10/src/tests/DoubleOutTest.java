@@ -263,7 +263,7 @@ public class DoubleOutTest {
 		
 		assertTrue(game.start());
 		assertNull(game.getWinner());
-		//assertTrue("Unexpected score", Arrays.equals(game.getScore(), expectedScores));
+		assertTrue("Unexpected score", Arrays.equals(game.getScore(), expectedScores));
 	}
 
 }

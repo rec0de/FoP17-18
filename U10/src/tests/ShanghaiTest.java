@@ -243,6 +243,64 @@ public class ShanghaiTest {
 		assertEquals(game.getActivePlayerNumber(), 0);
 		assertEquals(game.getLeftDarts(), 3);
 		
+		// Round 1
+		
+		assertTrue(game.throwDart(1, 3));
+		assertTrue(game.throwDart(0, 0));
+		assertTrue(game.throwDart(14, 2));
+		
+		expectedScores[0] = 3;
+		assertEquals(game.getActivePlayerNumber(), 1);
+		assertEquals(game.getLeftDarts(), 3);
+		
+		assertTrue(game.throwDart(25, 2));
+		assertTrue(game.throwDart(1, 1));
+		assertTrue(game.throwDart(1, 3));
+		
+		expectedScores[1] = 4;
+		assertEquals(game.getActivePlayerNumber(), 2);
+		assertEquals(game.getLeftDarts(), 3);
+		
+		game.throwDart(2, 1);
+		game.throwDart(1, 2);
+		game.throwDart(3, 1);
+		
+		expectedScores[2] += 2;
+		assertTrue("Unexpected score", Arrays.equals(game.getScore(), expectedScores));
+		
+		assertEquals(game.getActivePlayerNumber(), 3);
+		assertEquals(game.getLeftDarts(), 3);
+		
+		game.throwDart(2, 3);
+		game.throwDart(1, 1);
+		game.throwDart(2, 1);
+		
+		expectedScores[3] += 1;
+		assertEquals(game.getActivePlayerNumber(), 4);
+		assertEquals(game.getLeftDarts(), 3);
+		
+		game.throwDart(0, 0);
+		game.throwDart(2, 3);
+		game.throwDart(3, 3);
+		
+		expectedScores[4] += 0;
+		assertTrue("Unexpected score", Arrays.equals(game.getScore(), expectedScores));
+		
+		// Round 2
+		
+		assertEquals(game.getActivePlayerNumber(), 0);
+		assertEquals(game.getLeftDarts(), 3);
+		
+		game.throwDart(2, 1);
+		game.throwDart(2, 2);
+		game.throwDart(2, 3);
+		
+		expectedScores[0] += 12;
+		assertTrue("Unexpected score", Arrays.equals(game.getScore(), expectedScores));
+		
+		assertFalse(game.isRunning());
+		assertTrue(game.isOver());
+		assertEquals("Unexpected winner", game.getWinner(), player1);
 		
 	}
 
