@@ -6,14 +6,16 @@ package darts;
  */
 public class Tactics extends Darts {
 
+	// Scores are a 2d array with first index playerIndex, second index field number and value = times hit
 	private int scores[][];
 
 	/**
-	 * @param maxPlayers
+	 * Main constructor for Tactics class - initializes new Tactics game
+	 * @param maxPlayers Maximum number of players in the game
 	 */
 	public Tactics(int maxPlayers) {
 		super("Tactics", maxPlayers);
-		scores = new int[maxPlayers][];
+		scores = new int[maxPlayers][]; 
 	}
 
 	/* (non-Javadoc)
@@ -22,6 +24,7 @@ public class Tactics extends Darts {
 	@Override
 	void handleDart(int number, int multiplier) {
 		if(number >= 10) {
+			int activePlayerIndex = this.getActivePlayerNumber();
 			int index = (number == 25) ? 11 : number - 10; // Index in hit counting array is 0-10 for 10-20 and 11 for bull
 			this.scores[activePlayerIndex][index] += multiplier;
 
@@ -66,7 +69,7 @@ public class Tactics extends Darts {
 	 */
 	@Override
 	void handleNextPlayer() {
-		// Nothing needs to be done in this gamemode
+		// Nothing needs to be done on turn change in this gamemode
 	}
 
 }

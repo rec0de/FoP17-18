@@ -10,7 +10,7 @@ public class Shanghai extends Darts {
 	private int round = 0;
 	private int[] scores;
 	
-	private int currentTurnIndex;
+	private int currentTurnIndex; // n-th throw of current turn
 	private boolean currentTurnHasSingle;
 	private boolean currentTurnHasDouble;
 	private boolean currentTurnHasTriple;
@@ -30,6 +30,7 @@ public class Shanghai extends Darts {
 	@Override
 	void handleDart(int number, int multiplier) {
 		if(number == round) {
+			int activePlayerIndex = this.getActivePlayerNumber();
 			scores[activePlayerIndex] += number * multiplier;
 			
 			if(multiplier == 1 && currentTurnIndex == 1)
@@ -73,17 +74,18 @@ public class Shanghai extends Darts {
 		this.currentTurnHasTriple = false;
 		this.currentTurnIndex = 1;
 		
-		if(activePlayerIndex == 0) {
+		if(this.getActivePlayerNumber() == 0) {
 			this.nextRound();
 		}
 	}
 	
 	/**
-	 * Returns the current scores of all players as an array
+	 * Returns the current scores of all players as an array (indices corresponding to getPlayers() numbering)
 	 * @return Array of player scores
 	 */
 	public int[] getScore() {
 		// scores is statically initialized to maximum player count - we need to return an array containing _only_ scores that are actually connected to players
+		int playerCount = this.getPlayerCount();
 		int[] realScores = new int[playerCount];
 
 		for(int i = 0; i < playerCount; i++) {

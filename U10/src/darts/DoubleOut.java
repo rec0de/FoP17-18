@@ -14,7 +14,7 @@ public class DoubleOut extends Darts {
 	/**
 	 * Main constructor for DoubleOut Class - initializes a new DoubleOut game
 	 * @param startScore Initial score that is counted down from - traditionally 501
-	 * @param maxPlayers
+	 * @param maxPlayers Maximum number of players in the game
 	 */
 	public DoubleOut(int maxPlayers, int startScore) {
 		super("DoubleOut", maxPlayers);
@@ -27,12 +27,13 @@ public class DoubleOut extends Darts {
 	 */
 	@Override
 	void handleDart(int number, int multiplier) {
+		int activePlayerIndex = this.getActivePlayerNumber();
 		int newScore = scores[activePlayerIndex] - number * multiplier;
 		
 		if(newScore < 0 || (multiplier != 2 && newScore <= 1)) {
 			// discard remaining throws, end turn
-			this.currentPlayerDartsLeft = 1; // Value is decremented by one after handleDart() is called
-			this.scores[activePlayerIndex] = scoreBeforeTurn;
+			this.overrideDartsLeft(1);// Value is decremented by one after handleDart() is called, used to end turn
+			this.scores[activePlayerIndex] = scoreBeforeTurn; // Return score back to score before turn
 			return;
 		}
 		
@@ -66,15 +67,16 @@ public class DoubleOut extends Darts {
 	 */
 	@Override
 	void handleNextPlayer() {
-		this.scoreBeforeTurn = scores[activePlayerIndex];
+		this.scoreBeforeTurn = scores[this.getActivePlayerNumber()];
 	}
 	
 	/**
-	 * Returns the current scores of all players as an array
+	 * Returns the current scores of all players as an array (indices corresponding to getPlayers() numbering)
 	 * @return Array of player scores
 	 */
 	public int[] getScore() {
 		// scores is statically initialized to maximum player count - we need to return an array containing _only_ scores that are actually connected to players
+		int playerCount = this.getPlayerCount();
 		int[] realScores = new int[playerCount];
 
 		for(int i = 0; i < playerCount; i++) {

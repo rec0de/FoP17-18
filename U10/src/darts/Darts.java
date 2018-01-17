@@ -3,27 +3,27 @@ package darts;
 import java.util.Arrays;
 
 /**
+ * Class to model a generic game of Darts, implementing IDarts
  * @author Nils Rollshausen
- *
  */
 public abstract class Darts implements IDarts {
 	
 	private String gamemode;
 	private int maxPlayerCount;
 	private Player[] players;
+	private Player winner = null;
 	
-	int playerCount = 0;
-	Player winner = null;
-	int activePlayerIndex = 0;
-	int currentPlayerDartsLeft;
+	private int playerCount = 0;
+	private int activePlayerIndex = 0;
+	private int currentPlayerDartsLeft;
 	
-	boolean isRunning = false;
-	boolean isEnded = false;
+	private boolean isRunning = false;
+	private boolean isEnded = false;
 	
 	/**
-	 * 
-	 * @param gamemode
-	 * @param maxPlayers
+	 * Main constructor for Darts class - initializes new Darts game
+	 * @param gamemode Name of the gamemode being played
+	 * @param maxPlayers Maximum number of players in the game
 	 */
 	public Darts(String gamemode, int maxPlayers) {
 		this.gamemode = gamemode;
@@ -31,8 +31,12 @@ public abstract class Darts implements IDarts {
 		this.players = new Player[maxPlayers];
 	}
 
-	/* (non-Javadoc)
-	 * @see darts.IDarts#addPlayer(darts.Player)
+	/**
+	 * Adds a player to the game, 
+	 * prints an error in the console if the player limit is exceeded
+	 * 
+	 * @param player the player that is added to the game
+	 * @return true if the player was added, false if an error occurred
 	 */
 	@Override
 	public boolean addPlayer(Player player) {
@@ -58,85 +62,24 @@ public abstract class Darts implements IDarts {
 		playerCount += 1;
 		return handleNewPlayer(playerCount - 1);
 	}
-
-	/* (non-Javadoc)
-	 * @see darts.IDarts#getPlayerCount()
-	 */
-	@Override
-	public int getPlayerCount() {
-		return this.playerCount;
-	}
-
-	/* (non-Javadoc)
-	 * @see darts.IDarts#getPlayers()
-	 */
-	@Override
-	public Player[] getPlayers() {
-		// players is statically initialized to maximum player count - we need to return an array containing _only_ players that actually joined the game
-		Player[] realPlayers = new Player[playerCount];
-
-		for(int i = 0; i < playerCount; i++) {
-			realPlayers[i] = players[i];
-		}
-
-		return realPlayers;
-	}
 	
-	/* (non-Javadoc)
-	 * @see darts.IDarts#getActivePlayerNumber()
-	 */
-	@Override
-	public int getActivePlayerNumber() {
-		return this.activePlayerIndex;
-	}
-	
-	/* (non-Javadoc)
-	 * @see darts.IDarts#getLeftDarts()
-	 */
-	@Override
-	public int getLeftDarts() {
-		return this.currentPlayerDartsLeft;
-	}
 
-	/* (non-Javadoc)
-	 * @see darts.IDarts#getGamemode()
-	 */
-	@Override
-	public String getGamemode() {
-		return this.gamemode;
-	}
-
-	/* (non-Javadoc)
-	 * @see darts.IDarts#isRunning()
-	 */
-	@Override
-	public boolean isRunning() {
-		return this.isRunning;
-	}
-
-	/* (non-Javadoc)
-	 * @see darts.IDarts#isOver()
-	 */
-	@Override
-	public boolean isOver() {
-		return this.isEnded;
-	}
-
-	/* (non-Javadoc)
-	 * @see darts.IDarts#start()
+	/**
+	 * Starts the game
+	 * @return true if the game was started, false if an error occurred (to few players, game already started,...)
 	 */
 	@Override
 	public boolean start() {
 		if(!isRunning && !isEnded && playerCount > 0) {
 			this.isRunning = true;
 			this.isEnded = false;
-			this.winner = null; // Reset in case of object reuse across games
+			this.winner = null; // Reset in case of object reuse across games (shouldn't be possible, but doesn't hurt anyway)
 			this.activePlayerIndex = 0; // First player always starts
 			this.currentPlayerDartsLeft = 3; // All gamemodes have 3 darts per turn
 			this.handleNextPlayer();
 			return true;
 		}
-		else{
+		else{ // Something went wrong, print appropriate error message
 			if(isRunning)
 				System.out.println("Error: Couldn't start game, game is already running");
 			else if(isEnded) 
@@ -150,9 +93,12 @@ public abstract class Darts implements IDarts {
 		}
 	}
 	
-	/*
-	 * (non-Javadoc)
-	 * @see darts.IDarts#throwDart(int, int)
+	/**
+	 * A player throws a dart
+	 * 
+	 * @param number the number of the hit field, 0 if the player missed
+	 * @param multiplicator the multiplier of the hit field, 0 if the player missed
+	 * @return true if the throw was valid, false otherwise (invalid field/multiplier, game was not running,...)
 	 */
 	@Override
 	public boolean throwDart(int number, int multiplier) {
@@ -181,26 +127,18 @@ public abstract class Darts implements IDarts {
 		
 		return true;
 	}
-
-	/* (non-Javadoc)
-	 * @see darts.IDarts#getWinner()
+	
+	/**
+	 * Returns the winner
+	 * @return the player who has won or null if the game isn't over yet or there is no winner
 	 */
 	@Override
 	public Player getWinner() {
 		return this.winner;
 	}
-	
-	/**
-	 * 
-	 * @param playerIndex
-	 */
-	void setWinner(int playerIndex) {
-		if(playerIndex < players.length)
-			this.winner = players[playerIndex];
-	}
 
-	/* (non-Javadoc)
-	 * @see darts.IDarts#endGame()
+	/**
+	 * This method ends the game
 	 */
 	@Override
 	public void endGame() {
@@ -209,14 +147,114 @@ public abstract class Darts implements IDarts {
 	}
 	
 	/**
-	 * 
-	 * @param number
-	 * @param multiplier
+	 * Returns an array filled with all players
+	 * @return an array with all players
+	 */
+	@Override
+	public Player[] getPlayers() {
+		// players is statically initialized to maximum player count - we need to return an array containing _only_ players that actually joined the game
+		Player[] realPlayers = new Player[playerCount];
+
+		for(int i = 0; i < playerCount; i++) {
+			realPlayers[i] = players[i];
+		}
+
+		return realPlayers;
+	}
+
+	/** 
+	 * Returns the number of players playing the game 
+	 * @return the number of players
+	 */
+	@Override
+	public int getPlayerCount() {
+		return this.playerCount;
+	}
+	
+	/**
+	 * Returns the number of the active player
+	 * The players are numbered in the order they were added. The first player has number 0, the second 1, ...
+	 * @return the number of the active player
+	 */
+	@Override
+	public int getActivePlayerNumber() {
+		return this.activePlayerIndex;
+	}
+	
+	/**
+	 * returns the number of darts a player has left
+	 * @return the number of darts a player has left
+	 */
+	@Override
+	public int getLeftDarts() {
+		return this.currentPlayerDartsLeft;
+	}
+
+	/**
+	 * Returns the name of the gamemode
+	 * @return the name of the gamemode
+	 */
+	@Override
+	public String getGamemode() {
+		return this.gamemode;
+	}
+
+	/**
+	 * Checks if the game is running 
+	 * @return true if the game is running, false otherwise
+	 */
+	@Override
+	public boolean isRunning() {
+		return this.isRunning;
+	}
+
+	/**
+	 * Checks if the game is over
+	 * @return true if the game is over, false otherwise
+	 */
+	@Override
+	public boolean isOver() {
+		return this.isEnded;
+	}
+	
+	/**
+	 * Changes game winner to player with supplied index
+	 * @param playerIndex Index of the winning player in the players array
+	 */
+	void setWinner(int playerIndex) {
+		if(playerIndex < players.length)
+			this.winner = players[playerIndex];
+	}
+	
+	/**
+	 * Manually changes the number of darts the current player has left - used to prematurely end turns
+	 * @param newDartsLeft New number of darts left
+	 */
+	void overrideDartsLeft(int newDartsLeft) {
+		this.currentPlayerDartsLeft = newDartsLeft;
+	}
+	
+	/**
+	 * Delegates game-specific dart handling / score keeping to the implementing class _after_ throw validity has been confirmed
+	 * Called whenever a new dart is thrown
+	 * (Note that number and multiplier are guaranteed to correspond to a valid dart board field)
+	 * @param number The number value of the field hit
+	 * @param multiplier Multiplier of the field hit (1, 2, or 3)
 	 */
 	abstract void handleDart(int number, int multiplier);
 	
+	/**
+	 * Delegates game-specific player setup to the implementing class after the base player is set up
+	 * Player add is only considered successful if handleNewPlayer returns true
+	 * @param playerIndex Index of the newly added player in the player array
+	 * @return Returns true on success, false otherwise
+	 */
 	abstract boolean handleNewPlayer(int playerIndex);
 	
+	/**
+	 * Delegates game-specific per-turn setup to the implementing class
+	 * Called whenever a new Player takes turn
+	 */
 	abstract void handleNextPlayer();
 
 }
