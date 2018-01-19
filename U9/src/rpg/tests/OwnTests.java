@@ -66,7 +66,7 @@ public class OwnTests {
 	@Test
 	public void testCharacterStats() {
 		this.mage.setItem(new Wand());
-		this.mage.setSkill(new Fire());
+		this.mage.setSkill(new Fire(this.mage));
 		this.warrior.setItem(new Armor());
 		
 		assertEquals("Class: Mage Hp: 10 Mp: 9 At: 5 Def: 5 Item: Wand Skill: Fire", this.mage.getCharacterStats());
@@ -77,7 +77,7 @@ public class OwnTests {
 	public void testSetSkill() {
 		assertNull(this.mage.getSkill());
 		
-		this.mage.setSkill(new Fire());
+		this.mage.setSkill(new Fire(this.mage));
 		assertEquals(this.mage.getSkill().getName(), "Fire");
 		
 		this.mage.setSkill(null);
@@ -97,7 +97,7 @@ public class OwnTests {
 	
 	@Test
 	public void testReceiveMagicDamage() {
-		this.warrior.setSkill(new Fire());
+		this.warrior.setSkill(new Fire(this.warrior));
 		assertTrue("Test precondition not met: Warrior doesnt have enough MP", this.warrior.getCurrentMp() >= this.warrior.getSkill().getMpCosts());
 		this.warrior.useSkill(this.mage);
 		
@@ -116,7 +116,7 @@ public class OwnTests {
 	
 	@Test
 	public void testGetAllSkills() {
-		Skill[] skills = Skill.getAllSkills();
+		Skill[] skills = Skill.getAllSkills(this.mage);
 		
 		assertNull(skills[0]);
 		assertEquals(skills.length, 3);

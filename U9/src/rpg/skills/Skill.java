@@ -51,8 +51,8 @@ public abstract class Skill {
 	 * Lists all existing skills
 	 * @return Array with Instances of every possible skill
 	 */
-	public static Skill[] getAllSkills() {
-		return new Skill[] {null, new Fire(), new PowerStrike()};
+	public static Skill[] getAllSkills(RpgCharacter character) {
+		return new Skill[] {null, new Fire(character), new PowerStrike(character)};
 	}
 	
 	/**

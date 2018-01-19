@@ -17,13 +17,6 @@ public class PowerStrike extends Skill {
 	}
 	
 	/**
-	 * Empty constructor for use in getAllSkills without specified owner
-	 */
-	public PowerStrike() {
-		super("PowerStrike", null, 10);
-	}
-	
-	/**
 	 * Executes the Skill - deals 2x normal owner attack to the enemy
 	 * @param enemy The enemy to attack
 	 */

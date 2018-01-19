@@ -17,13 +17,6 @@ public class Fire extends Skill {
 	}
 	
 	/**
-	 * Empty constructor for use in getAllSkills without specified owner
-	 */
-	public Fire() {
-		super("Fire", null, 7);
-	}
-	
-	/**
 	 * Executes the Skill - deals 20 magic damage to the enemy
 	 * @param enemy The enemy to attack
 	 */
