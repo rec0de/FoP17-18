@@ -24,8 +24,12 @@ public class Shanghai extends Darts {
 		this.scores = new int[maxPlayers];
 	}
 
-	/* (non-Javadoc)
-	 * @see darts.Darts#handleDart(int, int)
+	/**
+	 * Handles a single valid dart throw, updating the score of the current player accordingly and triggering Shanghai if necessary
+	 * 
+	 * @param number the number of the hit field, 0 if the player missed
+	 * @param multiplicator the multiplier of the hit field, 0 if the player missed
+	 * @return true if the throw was valid, false otherwise (invalid field/multiplier, game was not running,...)
 	 */
 	@Override
 	void handleDart(int number, int multiplier) {
@@ -51,8 +55,10 @@ public class Shanghai extends Darts {
 
 	}
 
-	/* (non-Javadoc)
-	 * @see darts.Darts#handleNewPlayer(int)
+	/**
+	 * Handles a player join by initializing the players score to zero - called on player join
+	 * @param playerIndex Index of joining player in players array
+	 * @return Returns true on success, false otherwise
 	 */
 	@Override
 	boolean handleNewPlayer(int playerIndex) {
@@ -64,8 +70,9 @@ public class Shanghai extends Darts {
 		return true;
 	}
 
-	/* (non-Javadoc)
-	 * @see darts.Darts#handleNextPlayer()
+	/**
+	 * Re-sets Shanghai specific settings on turn end (specifically keeping track of which multipliers have been hit)
+	 * Triggers new round if all players had one turn and active player is first player
 	 */
 	@Override
 	void handleNextPlayer() {

@@ -18,8 +18,13 @@ public class Tactics extends Darts {
 		scores = new int[maxPlayers][]; 
 	}
 
-	/* (non-Javadoc)
-	 * @see darts.Darts#handleDart(int, int)
+	/**
+	 * Handles a single valid dart throw, updating the score of the current player accordingly
+	 * Ends the game if the player has hit all target fields
+	 * 
+	 * @param number the number of the hit field, 0 if the player missed
+	 * @param multiplicator the multiplier of the hit field, 0 if the player missed
+	 * @return true if the throw was valid, false otherwise (invalid field/multiplier, game was not running,...)
 	 */
 	@Override
 	void handleDart(int number, int multiplier) {
@@ -45,8 +50,10 @@ public class Tactics extends Darts {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see darts.Darts#handleNewPlayer(int)
+	/**
+	 * Handles a player join by initializing the players score table - called on player join
+	 * @param playerIndex Index of joining player in players array
+	 * @return Returns true on success, false otherwise
 	 */
 	@Override
 	boolean handleNewPlayer(int playerIndex) {
@@ -64,8 +71,8 @@ public class Tactics extends Darts {
 		return true;
 	}
 
-	/* (non-Javadoc)
-	 * @see darts.Darts#handleNextPlayer()
+	/**
+	 * Stub called on new turn - Does nothing as there is no Tactics-specific per-turn setup
 	 */
 	@Override
 	void handleNextPlayer() {
