@@ -156,25 +156,112 @@ public class TacticsTest {
 	
 	@Test
 	public void testMultiplayer() {
-		Tactics game = new Tactics(4);
+		Tactics game = new Tactics(10);
 		
 		Player player1 = new Player("A");
 		Player player2 = new Player("B");
 		Player player3 = new Player("C");
-		Player player4 = new Player("D");
 		
 		assertTrue("Player add failed", game.addPlayer(player1));
 		assertTrue("Player add failed", game.addPlayer(player2));
 		assertTrue("Player add failed", game.addPlayer(player3));
-		assertTrue("Player add failed", game.addPlayer(player4));
 		
 		assertTrue("Game start failed", game.start());
 		assertNull(game.getWinner());
 		
 		assertEquals(game.getActivePlayerNumber(), 0);
 		assertEquals(game.getLeftDarts(), 3);
+
+		game.throwDart(10, 3);
+		game.throwDart(11, 3);
+		assertEquals(game.getLeftDarts(), 1);
+		game.throwDart(12, 3);
+
+		assertEquals(game.getActivePlayerNumber(), 1);
+		assertEquals(game.getLeftDarts(), 3);
+
+		game.throwDart(10, 3);
+		game.throwDart(11, 3);
+		game.throwDart(12, 3);
+
+		game.throwDart(10, 3);
+		game.throwDart(11, 3);
+		game.throwDart(12, 3);
+
+		assertEquals(game.getActivePlayerNumber(), 0);
+		assertEquals(game.getLeftDarts(), 3);
+
+		game.throwDart(13, 3);
+		game.throwDart(14, 3);
+		game.throwDart(15, 3);
+
+		game.throwDart(13, 3);
+		game.throwDart(14, 3);
+		game.throwDart(15, 3);
+
+		game.throwDart(13, 3);
+		game.throwDart(14, 3);
+		game.throwDart(15, 3);
+
+		assertEquals(game.getActivePlayerNumber(), 0);
+		assertEquals(game.getLeftDarts(), 3);
+
+		game.throwDart(16, 3);
+		game.throwDart(17, 3);
+		game.throwDart(18, 3);
+
+		game.throwDart(16, 3);
+		game.throwDart(17, 3);
+		game.throwDart(18, 3);
+
+		game.throwDart(16, 3);
+		game.throwDart(17, 3);
+		game.throwDart(18, 3);
+
+		assertEquals(game.getActivePlayerNumber(), 0);
+		assertEquals(game.getLeftDarts(), 3);		
+
+		game.throwDart(19, 3);
+		game.throwDart(20, 3);
+		game.throwDart(25, 2);
+
+		game.throwDart(19, 3);
+		game.throwDart(20, 3);
+		game.throwDart(25, 2);
+
+		game.throwDart(19, 3);
+		game.throwDart(20, 3);
+		game.throwDart(25, 2);
+
+		assertEquals(game.getActivePlayerNumber(), 0);
+		assertEquals(game.getLeftDarts(), 3);	
+		assertTrue(game.isRunning());
+		assertNull(game.getWinner());
 		
+		game.throwDart(0, 0);
+		game.throwDart(5, 3);
+		game.throwDart(9, 2);
 		
+		game.throwDart(13, 2);
+		game.throwDart(14, 1);
+		game.throwDart(15, 1);
+
+		game.throwDart(16, 1);
+		game.throwDart(17, 1);
+		game.throwDart(19, 1);
+
+		assertTrue(game.isRunning());
+		assertNull(game.getWinner());
+
+		game.throwDart(0, 0);
+
+		assertTrue(game.isRunning());
+		assertNull(game.getWinner());
+
+		game.throwDart(25, 1);
+
+		assertFalse(game.isRunning());
+		assertEquals(game.getWinner(), player1);
 	}
 
 }
