@@ -26,6 +26,8 @@ class StudentTest {
 			}
 		}
 		
+		
+		// Generate random size Matrix and check that all values are initialized to zero
 		int height = (int) Math.floor(Math.random()*512);
 		int width = (int) Math.floor(Math.random()*512);
 		Matrix<Float> matrix2 = new Matrix<Float>(height, width, new FloatArithmetic());
@@ -72,6 +74,7 @@ class StudentTest {
 	public void testSetCell() {
 		Matrix<Float> a = new Matrix<Float>(100, 100, new FloatArithmetic());
 		
+		// Perform 1000 random write/read cycles on the matrix and check results
 		for(int i = 0; i < 1000; i++) {
 			int row = (int) Math.floor(Math.random()*100);
 			int col = (int) Math.floor(Math.random()*100);
@@ -180,13 +183,10 @@ class StudentTest {
 		assertTrue(e.transpose().equals(et));
 		assertTrue(d.transpose().equals(dt));
 		
+		// Generate a large random matrix and check that transposing twice produces the original matrix
 		int height = (int) Math.floor(Math.random()*512);
-		int width = (int) Math.floor(Math.random()*512);
-		
+		int width = (int) Math.floor(Math.random()*512);	
 		Matrix<Float> matrix = new Matrix<Float>(height, width, new FloatArithmetic());
-		
-		assertEquals(matrix.getColumns(), width);
-		assertEquals(matrix.getRows(), height);
 		
 		for(int i = 0; i < height; i++) {
 			for(int j = 0; j < width; j++) {
@@ -357,6 +357,9 @@ class StudentTest {
 		assertFalse(b.equals(r4));
 	}
 	
+	
+	// Tests various Matrix operations using problems and solutions of this years Math H8.1
+	// Does not conform to test specifications, but it's extra so who cares?
 	@Test
 	public void testMathHomework() {
 		
