@@ -2,6 +2,9 @@ package campusManagement;
 
 import java.time.LocalDateTime;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
  * Class represents a campus management system
@@ -141,5 +144,78 @@ public class CampusManagement {
 		ExaminationGrade examinationGrade = new ExaminationGrade(grade, student, examination);
 		student.getGrades().add(examinationGrade);
 		examination.getGrades().add(examinationGrade);
+	}
+	
+	/**
+	 * 
+	 * @param firstName
+	 * @param lastName
+	 * @return
+	 */
+	public Predicate<Student> filterStudentsByName(String firstName, String lastName){
+		return student -> {return student.getFirstName().toLowerCase().equals(firstName.toLowerCase()) && student.getLastName().toLowerCase().equals(lastName.toLowerCase());};
+	}
+	
+	/**
+	 * 
+	 * @param matriculationNumber
+	 * @return
+	 */
+	public Predicate<Student> filterStudentsByMatriculationNumber(int matriculationNumber){
+		return student -> {return student.getMatriculationNumber() == matriculationNumber;};
+	}
+	
+	/**
+	 * 
+	 * @param courseOfStudies
+	 * @return
+	 */
+	public Predicate<Student> filterStudentsByCourseOfStudies(String courseOfStudies){
+		return student -> student.getCourseOfStudies().toLowerCase().equals(courseOfStudies.toLowerCase());
+	}
+	
+	/**
+	 * 
+	 * @param name
+	 * @return
+	 */
+	public Predicate<Examination> filterExaminationsByName(String name){
+		return exam -> exam.getName().toLowerCase().equals(name.toLowerCase());
+	}
+	
+	/**
+	 * 
+	 * @param cp
+	 * @return
+	 */
+	public Predicate<Examination> filterExaminationsByCreditPoints(int cp){
+		return exam -> {return exam.getCreditPoints() == cp;};
+	}
+	
+	/**
+	 * 
+	 * @param semester
+	 * @return
+	 */
+	public Predicate<Examination> filterExaminationsBySemester(Semester semester){
+		return exam -> exam.getSemester().equals(semester);
+	}
+	
+	/**
+	 * 
+	 * @param filter
+	 * @return
+	 */
+	public List<Student> getFilteredStudents(Predicate<Student> filter){
+		return this.students.stream().filter(filter).collect(Collectors.toCollection(LinkedList::new));
+	}
+	
+	/**
+	 * 
+	 * @param filter
+	 * @return
+	 */
+	public List<Examination> getFilteredExaminations(Predicate<Examination> filter) {
+		return this.examinations.stream().filter(filter).collect(Collectors.toCollection(LinkedList::new));
 	}
 }

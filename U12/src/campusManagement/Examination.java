@@ -1,7 +1,15 @@
 package campusManagement;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Consumer;
+import java.util.function.DoubleConsumer;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
  * Class represents a examination in our management system
@@ -149,6 +157,50 @@ public class Examination {
 		sb.append(grades.size());
 		return sb.toString();
 	}
+	
+	/**
+	 * 
+	 * @param grade
+	 * @return
+	 */
+	public Predicate<ExaminationGrade> filterGradesByGrade(double grade){
+		return examgrade -> examgrade.getGrade() == grade;
+	}
 
+	/**
+	 * 
+	 * @param student
+	 * @return
+	 */
+	public Predicate<ExaminationGrade> filterGradesByStudent(Student student){
+		return examgrade -> examgrade.getStudent().equals(student);
+	}
 
+	/**
+	 * 
+	 * @param filter
+	 * @return
+	 */
+	public List<ExaminationGrade> getFilteredGrades(Predicate<ExaminationGrade> filter){
+		return this.grades.stream().filter(filter).collect(Collectors.toCollection(LinkedList::new));
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public double getAverageGrade() {
+		return this.grades.stream().mapToDouble(g -> g.getGrade()).average().getAsDouble();
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public Map<Double, Integer> getDistributionOfGrades(){
+		Map<Double, Integer> res = new HashMap<Double, Integer>();
+		DoubleConsumer consumer = g -> {res.put(g, res.containsKey(g) ? res.get(g) + 1 : 1);};
+		this.grades.stream().mapToDouble(g -> g.getGrade()).forEach(consumer);
+		return res;
+	}
 }
