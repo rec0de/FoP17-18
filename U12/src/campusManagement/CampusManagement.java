@@ -147,73 +147,73 @@ public class CampusManagement {
 	}
 	
 	/**
-	 * 
-	 * @param firstName
-	 * @param lastName
-	 * @return
+	 * Creates a predicate matching every student with equal first- and last name
+	 * @param firstName First name to match
+	 * @param lastName Last name to match
+	 * @return Predicate matching all students with the given name
 	 */
 	public Predicate<Student> filterStudentsByName(String firstName, String lastName){
 		return student -> {return student.getFirstName().toLowerCase().equals(firstName.toLowerCase()) && student.getLastName().toLowerCase().equals(lastName.toLowerCase());};
 	}
 	
 	/**
-	 * 
-	 * @param matriculationNumber
-	 * @return
+	 * Creates a predicate matching every student with the given matriculation number
+	 * @param matriculationNumber The matriculation number to match
+	 * @return Predicate matching all students with the given mat. number
 	 */
 	public Predicate<Student> filterStudentsByMatriculationNumber(int matriculationNumber){
 		return student -> {return student.getMatriculationNumber() == matriculationNumber;};
 	}
 	
 	/**
-	 * 
-	 * @param courseOfStudies
-	 * @return
+	 * Creates a predicate matching every student in the given course of studies
+	 * @param courseOfStudies The CoS to match
+	 * @return Predicate matching all students in the given CoS
 	 */
 	public Predicate<Student> filterStudentsByCourseOfStudies(String courseOfStudies){
 		return student -> student.getCourseOfStudies().toLowerCase().equals(courseOfStudies.toLowerCase());
 	}
 	
 	/**
-	 * 
-	 * @param name
-	 * @return
+	 * Creates a predicate matching every exam with the given name
+	 * @param name Exam name to match
+	 * @return Predicate matching all exams with the given name
 	 */
 	public Predicate<Examination> filterExaminationsByName(String name){
 		return exam -> exam.getName().toLowerCase().equals(name.toLowerCase());
 	}
 	
 	/**
-	 * 
-	 * @param cp
-	 * @return
+	 * Creates a predicate matching every exam with the given amount of CP
+	 * @param cp The amount of CP to match
+	 * @return Predicate matching all exams with given CP count
 	 */
 	public Predicate<Examination> filterExaminationsByCreditPoints(int cp){
 		return exam -> {return exam.getCreditPoints() == cp;};
 	}
 	
 	/**
-	 * 
-	 * @param semester
-	 * @return
+	 * Creates a predicate matching every exam in the given semester
+	 * @param semester The semester to match
+	 * @return Predicate matching all exams in the given semester
 	 */
 	public Predicate<Examination> filterExaminationsBySemester(Semester semester){
 		return exam -> exam.getSemester().equals(semester);
 	}
 	
 	/**
-	 * 
-	 * @param filter
-	 * @return
+	 * Filters all registered students using the supplied predicate
+	 * @param filter The predicate to use for matching
+	 * @return A list containing all students the predicate matches
 	 */
 	public List<Student> getFilteredStudents(Predicate<Student> filter){
 		return this.students.stream().filter(filter).collect(Collectors.toCollection(LinkedList::new));
 	}
 	
 	/**
-	 * 
-	 * @param filter
-	 * @return
+	 * Filters all exams using the supplied predicate
+	 * @param filter The predicate to use for matching
+	 * @return A list containing all exams the predicate matches
 	 */
 	public List<Examination> getFilteredExaminations(Predicate<Examination> filter) {
 		return this.examinations.stream().filter(filter).collect(Collectors.toCollection(LinkedList::new));

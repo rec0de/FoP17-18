@@ -159,43 +159,43 @@ public class Examination {
 	}
 	
 	/**
-	 * 
-	 * @param grade
-	 * @return
+	 * Creates a filter that matches ExaminationGrades with equal grade
+	 * @param grade The grade to match
+	 * @return Predicate matching all equal grades
 	 */
 	public Predicate<ExaminationGrade> filterGradesByGrade(double grade){
 		return examgrade -> examgrade.getGrade() == grade;
 	}
 
 	/**
-	 * 
-	 * @param student
-	 * @return
+	 * Creates a filter that matches ExaminationGrades with equal student
+	 * @param student The student to match
+	 * @return Predicate matching all ExaminationGrades by the given student
 	 */
 	public Predicate<ExaminationGrade> filterGradesByStudent(Student student){
 		return examgrade -> examgrade.getStudent().equals(student);
 	}
 
 	/**
-	 * 
-	 * @param filter
-	 * @return
+	 * Filters the exam's grades using the given predicate
+	 * @param filter The predicate used to match grades to keep
+	 * @return A list of all grades matching the filter
 	 */
 	public List<ExaminationGrade> getFilteredGrades(Predicate<ExaminationGrade> filter){
 		return this.grades.stream().filter(filter).collect(Collectors.toCollection(LinkedList::new));
 	}
 	
 	/**
-	 * 
-	 * @return
+	 *  Calculates the average of all grades in the exam
+	 * @return Average grade of the exam
 	 */
 	public double getAverageGrade() {
-		return this.grades.stream().mapToDouble(g -> g.getGrade()).average().getAsDouble();
+		return this.grades.stream().mapToDouble(g -> g.getGrade()).average().orElse(0.0);
 	}
 	
 	/**
-	 * 
-	 * @return
+	 * Counts all grades and groups them together
+	 * @return Map containing grade count for every unique grade
 	 */
 	public Map<Double, Integer> getDistributionOfGrades(){
 		Map<Double, Integer> res = new HashMap<Double, Integer>();
