@@ -188,9 +188,7 @@ public class CampusManagement {
 		if(examination.getFilteredGrades(examination.filterGradesByStudent(student)).size() > 0)
 			throw new GradeAlreadyExistsException("Student has already been graded");
 		
-		double[] allowed = {1.0, 1.3, 1.7, 2.0, 2.3, 2.7, 3.0, 3.3, 3.7, 4.0, 5.0};
-		
-		if(!Arrays.asList(allowed).contains(grade))
+		if(!(grade == 1 || grade == 1.3 || grade == 1.7 || grade == 2 || grade == 2.3 || grade == 2.7 || grade == 3 || grade == 3.3 || grade == 3.7 || grade == 4 || grade == 5))
 			throw new InvalidValueException("Invalid grade value");
 		
 		ExaminationGrade examinationGrade = new ExaminationGrade(grade, student, examination);
