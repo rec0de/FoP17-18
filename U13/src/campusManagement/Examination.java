@@ -2,6 +2,9 @@ package campusManagement;
 
 import java.time.LocalDateTime;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 /**
  * Class represents a examination in our management system
  * 
@@ -147,5 +150,23 @@ public class Examination {
 		sb.append("Grades given: ");
 		sb.append(grades.size());
 		return sb.toString();
+	}
+
+	/**
+	 * Creates a filter that matches ExaminationGrades with equal student
+	 * @param student The student to match
+	 * @return Predicate matching all ExaminationGrades by the given student
+	 */
+	public Predicate<ExaminationGrade> filterGradesByStudent(Student student){
+		return examgrade -> examgrade.getStudent().equals(student);
+	}
+
+	/**
+	 * Filters the exam's grades using the given predicate
+	 * @param filter The predicate used to match grades to keep
+	 * @return A list of all grades matching the filter
+	 */
+	public List<ExaminationGrade> getFilteredGrades(Predicate<ExaminationGrade> filter){
+		return this.grades.stream().filter(filter).collect(Collectors.toCollection(LinkedList::new));
 	}
 }
